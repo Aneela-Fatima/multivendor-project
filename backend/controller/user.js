@@ -51,10 +51,12 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
       })
 
     }catch(error){
+      if (req.file) fs.unlink(`uploads/${req.file.filename}`, () => {});
       return next (new ErrorHandler(err.message,500))
     }
 
   } catch (error) {
+    if (req.file) fs.unlink(`uploads/${req.file.filename}`, () => {});
     return next(new ErrorHandler(error.message,400));
   }
 });
@@ -65,6 +67,26 @@ const createActivationToken = (user)=>{
     expiresIn:"5m"
   })
 }
+
 // activate user
+router.post("/activation", async (req, res, next) => {
+  try {
+    const { activation_token } = req.body;
+    const newUser = jwt.verify(activation_token, process.env.ACTIVATION_SECRET);
+    if (!newUser) return next(new ErrorHandler("Invalid or expired token", 400));
+
+    const { name, email, password, avatar } = newUser;
+    let user = await User.findOne({ email });
+    if (user) return next(new ErrorHandler("User already exists", 400));
+
+    user = await User.create({
+      name, email, password,
+      avatar: { public_id: avatar, url: `${req.protocol}://${req.get("host")}/${avatar}` },
+    });
+    res.status(201).json({ success: true });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
 
 module.exports = router;
