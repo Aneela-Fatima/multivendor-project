@@ -9,6 +9,7 @@ const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendMail");
 const sendToken = require("../utils/jwtToken");
+const { isAuthenticated } = require("../middleware/auth");
 
 router.post("/create-user", upload.single("file"), async (req, res, next) => {
   try {
@@ -108,24 +109,48 @@ router.post(
   "/login-user",
   catchAsyncErrors(async (req, res, next) => {
     try {
-      const {email,password}=req.body;
+      const { email, password } = req.body;
 
-      if(!email || !password){
-        return next (new ErrorHandler("Please provide all fields!",400));
+      if (!email || !password) {
+        return next(new ErrorHandler("Please provide all fields!", 400));
       }
-      const user = await User.findOne({email}).select("+password");
+      const user = await User.findOne({ email }).select("+password");
 
-      if(!user){
-        return next (new ErrorHandler("User doesn't exist!",400));
+      if (!user) {
+        return next(new ErrorHandler("User doesn't exist!", 400));
       }
 
       const isPasswordValid = await user.comparePassword(password);
 
-      if(!isPasswordValid){
-        return next (new ErrorHandler("Please provide correct information!",400));
+      if (!isPasswordValid) {
+        return next(
+          new ErrorHandler("Please provide correct information!", 400),
+        );
       }
 
-      sendToken(user,201,res);
+      sendToken(user, 201, res);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }),
+);
+
+// load user
+router.get(
+  "/getuser",
+  isAuthenticated,
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user.id);
+
+      if (!user) {
+        return next(new ErrorHandler("User doesn't exist!", 400));
+      }
+
+      res.status(200).json({
+        success: true,
+        user,
+      });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
