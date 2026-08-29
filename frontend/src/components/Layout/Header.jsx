@@ -12,12 +12,19 @@ import { BiMenuAltLeft } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
 import DropDown from "./DropDown";
 import Navbar from "./Navbar";
+import { useSelector } from "react-redux";
+import { backend_url } from "../../server";
+import Cart from "../cart/Cart";  
+import Wishlist from "../Wishlist/Wishlist";
 
-const Header = (activeHeading) => {
+const Header = ({ activeHeading }) => {
+  const { isAuthenticated, user } = useSelector((state) => state.user);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState(null);
   const [active, setActive] = useState(false);
   const [dropDown, setDropDown] = useState(false);
+  const [openCart, setOpenCart] = useState(false);
+  const [openWishlist, setOpenWishlist] = useState(false);
 
   const handleSeacrchChange = (e) => {
     const term = e.target.value;
@@ -103,7 +110,7 @@ const Header = (activeHeading) => {
           className={`${styles.section} relative ${styles.noramlFlex} justify-between`}
         >
           {/* catagories */}
-          <div onClick={()=> setDropDown(!dropDown)}>
+          <div onClick={() => setDropDown(!dropDown)}>
             <div className="relative h-[60px] mt-[10px] w-[270px] hidden 1000px:block">
               <BiMenuAltLeft size={30} className="absolute top-3 left-2 " />
               <button
@@ -131,7 +138,7 @@ const Header = (activeHeading) => {
           {/*  */}
           <div className="flex">
             <div className={`${styles.noramlFlex}`}>
-              <div className="relative cursor-pointer mr-[15px]">
+              <div className="relative cursor-pointer mr-[15px]" onClick={()=> setOpenWishlist(true)}>
                 <AiOutlineHeart size={30} color="rgb(255 255 255 / 83%" />
                 <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
                   0
@@ -140,7 +147,9 @@ const Header = (activeHeading) => {
             </div>
 
             <div className={`${styles.noramlFlex}`}>
-              <div className="relative cursor-pointer mr-[15px]">
+              <div className="relative cursor-pointer mr-[15px]"
+              onClick={()=>setOpenCart(true)}
+              >
                 <AiOutlineShoppingCart
                   size={30}
                   color="rgb(255 255 255 / 83%"
@@ -153,11 +162,34 @@ const Header = (activeHeading) => {
 
             <div className={`${styles.noramlFlex}`}>
               <div className="relative cursor-pointer mr-[15px]">
-                <Link to="/login">
-                  <CgProfile size={30} color="rgb(255 255 255 / 83%" />
-                </Link>
+                {isAuthenticated ? (
+                  <Link to="/profile">
+                    <img
+                      src={`${backend_url}${user.avatar}`}
+                      alt=""
+                      className="w-[35px] h-[35px] rounded-full"
+                    />
+                  </Link>
+                ) : (
+                  <Link to="/login">
+                    <CgProfile size={30} color="rgb(255 255 255 / 83%" />
+                  </Link>
+                )}
               </div>
             </div>
+            {/* cart popup */}
+            {
+              openCart?(
+                <Cart setOpenCart={setOpenCart} />
+              ):null
+            }
+
+             {/* wishlist popup */}
+            {
+              openWishlist?(
+                <Wishlist setOpenWishlist={setOpenWishlist} />
+              ):null
+            }
           </div>
         </div>
       </div>

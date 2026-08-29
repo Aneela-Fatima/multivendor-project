@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "../../../styles/styles";
+import ProductDetailsCard from "../ProductDetailsCard/ProductDetailsCard";
 import {
   AiFillHeart,
   AiFillStar,
@@ -100,20 +101,21 @@ const ProductCard = ({ data }) => {
             />
           )}
           <AiOutlineEye
-              size={22}
-              className="cursor-pointer absolute right-2 top-14"
-              onClick={() => setOpen(!open)}
-              color= "#333"
-              title="Quick View"
-            />
+            size={22}
+            className="cursor-pointer absolute right-2 top-14"
+            onClick={() => setOpen(!open)}
+            color="#333"
+            title="Quick View"
+          />
 
-            <AiOutlineShoppingCart
-              size={25}
-              className="cursor-pointer absolute right-2 top-24"
-              onClick={() => setOpen(!open)}
-              color= "#444"
-              title="Add to cart"
-            />
+          <AiOutlineShoppingCart
+            size={25}
+            className="cursor-pointer absolute right-2 top-24"
+            onClick={() => setOpen(!open)}
+            color="#444"
+            title="Add to cart"
+          />
+          {open ? <ProductDetailsCard setOpen={setOpen} data={data} /> : null}
         </div>
       </div>
     </>
