@@ -30,7 +30,12 @@ const Login = () => {
         window.location.reload(true);
       })
       .catch((err) => {
-        toast.error(err.response.data.message);
+        const message =
+          err.response?.data?.message ||
+          (err.request
+            ? "Unable to connect to the server. Make sure the backend is running."
+            : "Login failed. Please try again.");
+        toast.error(message);
       });
   };
 

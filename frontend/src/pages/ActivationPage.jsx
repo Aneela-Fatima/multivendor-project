@@ -22,7 +22,7 @@ const ActivationPage = () => {
       };
       activationEmail();
     }
-  }, [activation_token]);
+  }, []);
 
   return <div style={{
     width:"100%",
