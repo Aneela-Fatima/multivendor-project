@@ -5,8 +5,9 @@ const fs = require("fs");
 const { upload } = require("../multer");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendMail");
-const sendToken = require("../utils/jwtToken");
+const sendShopToken = require("../utils/ShopToken");
 const { isAuthenticated } = require("../middleware/auth");
+const { isSeller } = require("../middleware/auth");
 const Shop = require("../model/shop");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const ErrorHandler = require("../utils/ErrorHandler");
@@ -106,7 +107,7 @@ router.post(
         phoneNumber,
       });
 
-      sendToken(seller, 201, res);
+      sendShopToken(seller, 201, res);
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
@@ -139,7 +140,29 @@ router.post(
         );
       }
 
-      sendToken(user, 201, res);
+      sendShopToken(user, 201, res);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }),
+);
+
+//load shop
+router.get(
+  "/getSeller",
+    isSeller,
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const seller = await Shop.findById(req.seller._id);
+
+      if (!seller) {
+        return next(new ErrorHandler("User doesn't exist!", 400));
+      }
+
+      res.status(200).json({
+        success: true,
+        seller,
+      });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
