@@ -170,4 +170,25 @@ router.get(
 );
 
 
+// Logout shop
+router.get(
+  "/logout",
+  isAuthenticated,
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      re.cookie("seller-token", null, {
+        expires: new Date(Date.now()),
+        httpOnly: true,
+      });
+
+      re.status(201).json({
+        succes: true,
+        message: "LogOut Successfully!",
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }),
+);
+
 module.exports = router;
