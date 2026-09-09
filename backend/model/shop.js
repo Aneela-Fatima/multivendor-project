@@ -20,28 +20,9 @@ const shopSchema = new mongoose.Schema({
   description: {
     type: String,
   },
-  addresses: [
-    {
-      country: {
-        type: String,
-        required: true,
-      },
-      city: {
-        type: String,
-        required: true,
-      },
-      address1: {
-        type: String,
-      },
-      address2: {
-        type: String,
-      },
-      addressType: {
-        type: String,
-        required: true,
-      },
-    },
-  ],
+  address: {
+    type: String,
+  },
   phoneNumber: {
     type: Number,
     required: true,

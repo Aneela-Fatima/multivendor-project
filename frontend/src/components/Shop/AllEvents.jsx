@@ -4,35 +4,32 @@ import { DataGrid } from "@mui/x-data-grid";
 import { Button } from "@mui/material";
 import { AiOutlineDelete, AiOutlineEye } from "react-icons/ai";
 import { Link } from "react-router-dom";
-import { getAllProductsShop } from "../../redux/actions/product";
-import { deleteProduct } from "../../redux/actions/product";
+import { getAllEventsShop } from "../../redux/actions/event";
+import {deleteEvent} from "../../redux/actions/event";
 import Loader from "../Layout/Loader";
-import styles from "../../styles/styles";
-import { useState } from "react";
-import { RxCross1 } from "react-icons/rx";
 
-const AllProducts = () => {
-  const [open, setOpen] = useState();
-  const { products = [], isLoading } = useSelector((state) => state.products);
+const AllEvents = () => {
+  const { events = [], isLoading } = useSelector((state) => state.events);
   const { seller } = useSelector((state) => state.seller);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (seller?._id) {
-      dispatch(getAllProductsShop(seller._id));
+      dispatch(getAllEventsShop(seller._id));
     }
   }, [dispatch, seller?._id]);
 
-  const handleDelete = (id) => {
-    dispatch(deleteProduct(id));
+
+  const handleDelete = (id) =>{
+    dispatch(deleteEvent(id));
     window.location.reload();
-  };
+  }
 
   const columns = [
     {
       field: "id",
-      headerName: "Product ID",
+      headerName: "Event ID",
       minWidth: 150,
       flex: 0.7,
     },
@@ -93,7 +90,9 @@ const AllProducts = () => {
       renderCell: (params) => {
         return (
           <>
-            <Button onClick={() => handleDelete(params.id)}>
+            <Button
+            onClick={()=>handleDelete(params.id)}
+            >
               <AiOutlineDelete size={20} />
             </Button>
           </>
@@ -103,8 +102,8 @@ const AllProducts = () => {
   ];
 
   const row = [];
-  products &&
-    products.forEach((item) => {
+  events &&
+    events.forEach((item) => {
       row.push({
         id: item._id,
         name: item.name,
@@ -120,15 +119,6 @@ const AllProducts = () => {
         <Loader />
       ) : (
         <div className="w-full mt-10 pt-1 mx-8 bg-white ">
-          <div className="w-full flex justify-end">
-            <div
-              className={`${styles.button} !w-max !h-[45px] px-3 !rounded-[5px] mr-3 mb-3`}
-              onClick={() => setOpen(true)}
-            >
-              <span className="text-white">Create Coupoun Code</span>
-            </div>
-          </div>
-
           <DataGrid
             rows={row}
             columns={columns}
@@ -136,24 +126,10 @@ const AllProducts = () => {
             autoHeight
             disableSelectionOnClick
           />
-          {open && (
-            <div className="fixed top-0 left-0 w-full h-screen bg-[#00000062] z-[2000] flex items-center justify-center">
-              <div className="w-[90%] 800px:w-[40%] h-[80vh] bg-white rounded-md shadow p-4">
-                <div className="w-full flex justify-end">
-                  <RxCross1
-                    size={30}
-                    className="cursor-pointer"
-                    onClick={() => setOpen(false)}
-                  />
-                </div>
-                <h5></h5>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </>
   );
 };
 
-export default AllProducts;
+export default AllEvents;
