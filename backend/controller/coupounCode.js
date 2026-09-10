@@ -8,16 +8,16 @@ const CoupounCode = require("../model/coupounCode");
 
 // crete coupoun code
 router.post(
-  "/create-coupoun-code",
+  "/create-coupon-code",
   isSeller,
   catchAsyncErrors(async (req, res, next) => {
     try {
-      const isCoupounCodeExists = await CoupounCode.find({
+      const existingCoupon = await CoupounCode.findOne({
         name: req.body.name,
       });
 
-      if (isCoupounCodeExists) {
-        return next(new ErrorHandler("Coupoun Code already exist!", 400));
+      if (existingCoupon) {
+        return next(new ErrorHandler("Coupoun Code already exists!", 400));
       }
 
       const coupounCode = await CoupounCode.create(req.body);
@@ -27,7 +27,33 @@ router.post(
         coupounCode,
       });
     } catch (error) {
-      return next(new ErrorHandler(error, 400));
+      return next(
+        new ErrorHandler(error.message || "Unable to create coupon code", 400),
+      );
     }
   }),
 );
+
+//  get all coupons of shop
+router.get(
+  "/get-coupon/:id",
+  isSeller,
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const couponCodes = await CoupounCode.find({
+        $or: [{ shop: req.params.id }, { "shop._id": req.params.id }],
+      });
+
+      res.status(200).json({
+        success: true,
+        couponCodes,
+      });
+    } catch (error) {
+      return next(
+        new ErrorHandler(error.message || "Unable to fetch coupons", 400),
+      );
+    }
+  }),
+);
+
+module.exports = router;
