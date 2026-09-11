@@ -21,31 +21,54 @@ const CreateEvent = () => {
   const [originalPrice, setOriginalPrice] = useState();
   const [discountPrice, setDiscountPrice] = useState();
   const [stock, setStock] = useState();
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const handleStartDateChange = (e) => {
-    const startDate = new Date(e.targer.value);
-    const minEndDate = new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000);
-    setStartDate(startDate);
-    setEndDate(null);
-    document.getElementById("end-date").min = minEndDate.toISOString.slice(
-      0,
-      10,
+    const selectedValue = e.target.value;
+    if (!selectedValue) {
+      setStartDate("");
+      setEndDate("");
+      return;
+    }
+
+    const selectedStartDate = new Date(`${selectedValue}T00:00:00`);
+    if (Number.isNaN(selectedStartDate.getTime())) {
+      return;
+    }
+
+    const minEndDate = new Date(
+      selectedStartDate.getTime() + 3 * 24 * 60 * 60 * 1000,
     );
+
+    setStartDate(selectedValue);
+    setEndDate("");
+
+    const endDateInput = document.getElementById("end-date");
+    if (endDateInput) {
+      endDateInput.min = minEndDate.toISOString().slice(0, 10);
+    }
   };
 
   const handleEndDateChange = (e) => {
-    const endDate = new Date(e.targer.value);
-    setEndDate(endDate);
+    const selectedValue = e.target.value;
+    if (!selectedValue) {
+      setEndDate("");
+      return;
+    }
+
+    const selectedEndDate = new Date(`${selectedValue}T00:00:00`);
+    if (Number.isNaN(selectedEndDate.getTime())) {
+      return;
+    }
+
+    setEndDate(selectedValue);
   };
 
   const today = new Date().toISOString().slice(0, 10);
   const minEndDate = startDate
-    ? new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .slice(0, 10)
-    : today;
+    ? new Date(`${startDate}T00:00:00`).getTime() + 3 * 24 * 60 * 60 * 1000
+    : new Date(`${today}T00:00:00`).getTime();
 
   useEffect(() => {
     if (error) {
@@ -68,6 +91,16 @@ const CreateEvent = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (!seller?._id) {
+      toast.error("Seller not found. Please login again.");
+      return;
+    }
+
+    if (!images.length || !name || !description || !category || !discountPrice || !stock || !startDate || !endDate) {
+      toast.error("Please fill all required fields before creating the event.");
+      return;
+    }
+
     const newForm = new FormData();
 
     images.forEach((image) => {
@@ -77,13 +110,13 @@ const CreateEvent = () => {
     newForm.append("description", description);
     newForm.append("category", category);
     newForm.append("tags", tags);
-    newForm.append("originalPrice", originalPrice);
+    newForm.append("originalPrice", originalPrice || 0);
     newForm.append("discountPrice", discountPrice);
     newForm.append("stock", stock);
     newForm.append("shopId", seller._id);
-    newForm.append("start_Date",startDate.toISOString());
-        newForm.append("Finish_Date",endDate.toISOString());
-    dispatch(createEvent(newForm))
+    newForm.append("start_Date", new Date(`${startDate}T00:00:00`).toISOString());
+    newForm.append("Finish_Date", new Date(`${endDate}T00:00:00`).toISOString());
+    dispatch(createEvent(newForm));
   };
 
   return (
@@ -199,9 +232,9 @@ const CreateEvent = () => {
           </label>
           <input
             type="date"
-            name="price"
+            name="startDate"
             id="start-date"
-            value={startDate ? startDate.toISOString().slice(0, 10) : ""}
+            value={startDate}
             className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 sm:text-sm"
             onChange={handleStartDateChange}
             min={today}
@@ -214,12 +247,12 @@ const CreateEvent = () => {
           </label>
           <input
             type="date"
-            name="price"
-            id="start-date"
-            value={endDate ? endDate.toISOString().slice(0, 10) : ""}
+            name="endDate"
+            id="end-date"
+            value={endDate}
             className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 sm:text-sm"
             onChange={handleEndDateChange}
-            min={minEndDate}
+            min={new Date(minEndDate).toISOString().slice(0, 10)}
           />
         </div>
         <br />

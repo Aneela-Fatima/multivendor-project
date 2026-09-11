@@ -1,8 +1,6 @@
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { render } from "@testing-library/react";
+import EventCard from "./components/Events/EventCard";
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+test("EventCard does not crash when no event data is provided", () => {
+  expect(() => render(<EventCard />)).not.toThrow();
 });

@@ -25,15 +25,28 @@ export const eventReducer = createReducer(initialState, (builder) => {
       state.success = false;
     })
 
-    // get all products of shop
-    .addCase("getAlleventsShopRequest", (state) => {
+        // get all events of shop
+    .addCase("getAllEventsShopRequest", (state) => {     // was "getAlleventsShopRequest"
       state.isLoading = true;
     })
-    .addCase("getAlleventsShopSuccess", (state, action) => {
+    .addCase("getAllEventsShopSuccess", (state, action) => {   // was "getAlleventsShopSuccess"
       state.isLoading = false;
       state.events = action.payload;
     })
-    .addCase("getAlleventsShopFailed", (state, action) => {
+    .addCase("getAllEventsShopFailed", (state, action) => {    // was "getAlleventsShopFailed"
+      state.isLoading = false;
+      state.error = action.payload;
+    })
+
+    // get all events (all shops) — NEW
+    .addCase("getAllEventsRequest", (state) => {
+      state.isLoading = true;
+    })
+    .addCase("getAllEventsSuccess", (state, action) => {
+      state.isLoading = false;
+      state.allEvents = action.payload;
+    })
+    .addCase("getAllEventsFailed", (state, action) => {
       state.isLoading = false;
       state.error = action.payload;
     })

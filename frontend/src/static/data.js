@@ -194,69 +194,69 @@ export const navItems = [
       title: "Computers and Laptops",
       subTitle: "",
       image_Url:
-        "https://unsplash.com/s/photos/laptop-computer?utm_source=chatgpt.com",
+        "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bGFwdG9wJTIwY29tcHV0ZXJ8ZW58MHx8MHx8fDA%3D",
     },
     {
       id: 2,
       title: "Wearable Technology",
       subTitle: "",
       image_Url:
-        "https://unsplash.com/s/photos/wearable-tech?utm_source=chatgpt.com",
+        "https://images.unsplash.com/photo-1580943943004-6a4697b70059?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fHdlYXJhYmxlJTIwdGVjaHxlbnwwfHwwfHx8MA%3D%3D",
     },
     {
       id: 3,
       title: "Gaming",
       subTitle: "",
       image_Url:
-        "https://unsplash.com/s/photos/gaming-setup?utm_source=chatgpt.com",
+        "https://images.unsplash.com/photo-1614179924047-e1ab49a0a0cf?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Z2FtaW5nJTIwc2V0dXB8ZW58MHx8MHx8fDA%3D",
     },
     {
       id: 4,
       title: "Mobile Accessories",
       subTitle: "",
       image_Url:
-        "https://www.pexels.com/search/mobile%20accessories/?utm_source=chatgpt.com",
+        "https://images.pexels.com/photos/18533790/pexels-photo-18533790.jpeg",
     },
     {
       id: 5,
       title: "PC Components",
       subTitle: "",
       image_Url:
-        "https://unsplash.com/s/photos/pc-components?utm_source=chatgpt.com",
+        "https://plus.unsplash.com/premium_photo-1723921242867-42dbc213fbd1?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cGMlMjBjb21wb25lbnRzfGVufDB8fDB8fHww",
     },
     {
       id: 6,
       title: "Smartphones & Tablets",
       subTitle: "",
       image_Url:
-        "https://unsplash.com/s/photos/smart-home?utm_source=chatgpt.com",
+        "https://images.unsplash.com/photo-1672413514634-4781b15fd89e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8c21hcnRwaG9uZXN8ZW58MHx8MHx8fDA%3D",
     },
     {
       id: 7,
       title: "Smart Home",
       subTitle: "",
-      image_Url: "https://cdn.openpr.com/T/c/Tc15444071_g.jpg",
+      image_Url: "https://plus.unsplash.com/premium_photo-1688686804638-fadb460edc4a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8c21hcnQlMjBob21lfGVufDB8fDB8fHww",
     },
     {
       id: 8,
       title: "Networking & Wi-Fi Devices",
       subTitle: "",
       image_Url:
-        "https://unsplash.com/s/photos/wifi-router?utm_source=chatgpt.com",
+        "https://images.unsplash.com/photo-1750711158632-5273ec9b9b86?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fHdpZmklMjByb3V0ZXJ8ZW58MHx8MHx8fDA%3D",
     },
     {
       id: 9,
       title: "Audio & Headphones",
       subTitle: "",
       image_Url:
-        "https://unsplash.com/s/photos/listening-headphones?utm_source=chatgpt.com",
+        "https://images.unsplash.com/photo-1487215078519-e21cc028cb29?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGxpc3RlbmluZyUyMGhlYWRwaG9uZXN8ZW58MHx8MHx8fDA%3D",
     },
     {
       id: 10,
       title: "Cameras & Photography",
       subTitle: "",
       image_Url:
-        "https://unsplash.com/s/photos/cameras?utm_source=chatgpt.com",
+        "https://images.unsplash.com/photo-1581591524425-c7e0978865fc?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGNhbWVyYXN8ZW58MHx8MHx8fDA%3D",
     },
     {
       id: 11,

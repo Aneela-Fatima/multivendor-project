@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "../../styles/styles";
+import { backend_url } from "../../server";
+import {useDispatch,useSelector} from "react-redux";
+import { getAllProductsShop } from "../../redux/actions/product";
 import {
   AiFillHeart,
   AiOutlineHeart,
@@ -9,10 +12,20 @@ import {
 } from "react-icons/ai";
 
 const ProductDetails = ({ data }) => {
+
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
   const [select, setSelect] = useState(0);
   const navigate = useNavigate();
+
+
+  const {products} = useSelector((state)=>state.products);
+  const dispatch = useDispatch();
+  useEffect(()=>{
+    dispatch(getAllProductsShop(data._id));
+  },[dispatch,data])
+
+  
 
   const decrementCount = () => {
     if (count > 1) {
@@ -37,30 +50,29 @@ const ProductDetails = ({ data }) => {
               <div className="w-full 800:w-[42%] flex justify-center">
                 <div className="w-full max-w-[520px]">
                   <img
-                    src={data.image_Url[select].url}
+                    src={`${backend_url}${data && data.images[select]}`}
                     alt=""
                     className="w-full max-w-[500px] mx-auto object-contain"
                   />
                   <div className="w-full flex gap-3 mt-4 justify-center">
-                    <div
+                    {
+                      data && data.images.map((i,index)=>{
+                        <div
                       className={`${select === 0 ? "border-2 border-blue-500" : "border border-gray-200"} cursor-pointer p-1 rounded-md`}
                     >
                       <img
                         alt=""
-                        src={data?.image_Url[0].url}
-                        className="h-[120px] w-[120px] object-cover rounded-md"
-                        onClick={() => setSelect(0)}
+                        src={`${backend_url}${i}`}
+                        className="h-[120px] w-[120px] object-cover rounded-md overflow-hidden mr-3 mt-3"
+                        onClick={() => setSelect(index)}
                       />
                     </div>
+                      })
+                    }
                     <div
                       className={`${select === 1 ? "border-2 border-blue-500" : "border border-gray-200"} cursor-pointer p-1 rounded-md`}
                     >
-                      <img
-                        alt=""
-                        src={data?.image_Url[1].url}
-                        className="h-[120px] w-[120px] object-cover rounded-md"
-                        onClick={() => setSelect(1)}
-                      />
+                      
                     </div>
                   </div>
                 </div>
@@ -84,7 +96,7 @@ const ProductDetails = ({ data }) => {
                   <h3
                     className={`${styles.price} text-[16px] 800:text-[20px] font-[400] mb-2`}
                   >
-                    {data.price ? data.price + "$" : null}
+                    {data.originalPrice ? data.originalPrice + "$" : null}
                   </h3>
                 </div>
                 <div className="flex items-center mt-12 justify-between pr-3">
@@ -137,7 +149,7 @@ const ProductDetails = ({ data }) => {
 
                 <div className="flex items-center pt-8">
                   <img
-                    src={data.shop.shop_avatar.url}
+                    src={`${backend_url}${data?.shop?.avatar}`}
                     alt="Shop Avatar"
                     className="h-[50px] w-[50px] rounded-full mr-2"
                   />
@@ -162,7 +174,7 @@ const ProductDetails = ({ data }) => {
             </div>
           </div>
 
-          <ProductDetailsInfo data={data} />
+          <ProductDetailsInfo data={data} products={products}/>
           <br />
           <br />
         </div>
@@ -171,7 +183,7 @@ const ProductDetails = ({ data }) => {
   );
 };
 
-const ProductDetailsInfo = ({ data }) => {
+const ProductDetailsInfo = ({ data,products } ) => {
   const [active, setActive] = useState(1);
   return (
     <div className=" bg-[#f5f5f5] px-3 800px:px-10  py-2 rounded">
@@ -216,47 +228,9 @@ const ProductDetailsInfo = ({ data }) => {
       {active === 1 ? (
         <>
           <p className="py-2 text-[18px] pb-10 whitespace-pre-line 800:text-[18px] leading-8">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-            Voluptatibus dignissimos at accusantium aliquid quo nesciunt minus
-            fugiat perspiciatis vero. Nostrum asperiores exercitationem,
-            voluptas quis hic quia quo ratione nam perspiciatis! Deserunt error
-            amet, libero nesciunt, officiis facilis molestias ducimus ipsa
-            quibusdam sit deleniti! Iusto officia suscipit debitis sunt. Natus
-            maiores suscipit vero autem cum? Officia incidunt iure eos sapiente
-            aliquam? Nostrum asperiores exercitationem, voluptas quis hic quia
-            quo ratione nam perspiciatis! Deserunt error amet, libero nesciunt,
-            officiis facilis molestias ducimus ipsa quibusdam sit deleniti!
-            Iusto officia suscipit debitis sunt. Natus maiores suscipit vero
-            autem cum? Officia incidunt iure eos sapiente aliquam?
+            {data.description}
           </p>
-          <p className="py-2 text-[18px] pb-10 whitespace-pre-line 800:text-[18px] leading-8">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-            Voluptatibus dignissimos at accusantium aliquid quo nesciunt minus
-            fugiat perspiciatis vero. Nostrum asperiores exercitationem,
-            voluptas quis hic quia quo ratione nam perspiciatis! Deserunt error
-            amet, libero nesciunt, officiis facilis molestias ducimus ipsa
-            quibusdam sit deleniti! Iusto officia suscipit debitis sunt. Natus
-            maiores suscipit vero autem cum? Officia incidunt iure eos sapiente
-            aliquam? Nostrum asperiores exercitationem, voluptas quis hic quia
-            quo ratione nam perspiciatis! Deserunt error amet, libero nesciunt,
-            officiis facilis molestias ducimus ipsa quibusdam sit deleniti!
-            Iusto officia suscipit debitis sunt. Natus maiores suscipit vero
-            autem cum? Officia incidunt iure eos sapiente aliquam?
-          </p>
-          <p className="py-2 text-[18px] pb-10 whitespace-pre-line 800:text-[18px] leading-8">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-            Voluptatibus dignissimos at accusantium aliquid quo nesciunt minus
-            fugiat perspiciatis vero. Nostrum asperiores exercitationem,
-            voluptas quis hic quia quo ratione nam perspiciatis! Deserunt error
-            amet, libero nesciunt, officiis facilis molestias ducimus ipsa
-            quibusdam sit deleniti! Iusto officia suscipit debitis sunt. Natus
-            maiores suscipit vero autem cum? Officia incidunt iure eos sapiente
-            aliquam? Nostrum asperiores exercitationem, voluptas quis hic quia
-            quo ratione nam perspiciatis! Deserunt error amet, libero nesciunt,
-            officiis facilis molestias ducimus ipsa quibusdam sit deleniti!
-            Iusto officia suscipit debitis sunt. Natus maiores suscipit vero
-            autem cum? Officia incidunt iure eos sapiente aliquam?
-          </p>
+          
         </>
       ) : null}
 
@@ -269,9 +243,10 @@ const ProductDetailsInfo = ({ data }) => {
       {active === 3 && (
         <div className="w-full min-h-[40vh] block 800px:flex p-5">
           <div className="w-full 800px:w-[50%]">
+            <Link to={`/shop/preview/${data.shop._id}`}>
             <div className="flex items-center">
               <img
-                src={data.shop.shop_avatar.url}
+                src={`${backend_url}${data?.shop?.avatar}`}
                 alt=""
                 className="w-[50px] h-[50px] rounded-full"
               />
@@ -282,20 +257,19 @@ const ProductDetailsInfo = ({ data }) => {
                 </h5>
               </div>
             </div>
+            
+            </Link>
             <p className="pt-2">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis
-              porro illo, molestiae est voluptate debitis, suscipit mollitia
-              culpa quos excepturi ab maxime eligendi! Sunt voluptate iste
-              voluptas non eveniet delectus!
+              {data.shop.description}
             </p>
           </div>
           <div className="w-full 800px:[50%] 800px:mt-0 800px:flex flex-col items-end mt-5">
             <div className="text-left">
               <h5 className="font-[600] ">
-                Joined on: <span className="font-[500]"> 20-08-2026</span>
+                Joined on: <span className="font-[500]">{data.shop?.createdAt?.slice(0,10)}</span>
               </h5>
               <h5 className="font-[600] pt-3">
-                Total Products: <span className="font-[500]"> 1020</span>
+                Total Products: <span className="font-[500]">{products && products.length}</span>
               </h5>
               <h5 className="font-[600] pt-3">
                 Total Reviews: <span className="font-[500]"> 20</span>
