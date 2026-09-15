@@ -7,9 +7,9 @@ import BestSellingPage from "../pages/BestSellingPage";
 import EventsPage from "../pages/EventsPage";
 import FAQPage from "../pages/FAQPage";
 import ProductDetailsPage from "../pages/ProductDetailsPage";
-// import CheckoutPage from "../src/pages/CheckoutPage";
-// import PaymentPage from "../src/pages/PaymentPage";
-import OrderSuccessPage from "../../src/pages/OrderSuccessPage.jsx";
+import CheckoutPage from "../pages/CheckoutPage";
+import PaymentPage from "../pages/PaymentPage";
+import OrderSuccessPage from "../pages/OrderSuccessPage.jsx";
 import ProfilePage from "../pages/ProfilePage";
 import ShopCreatePage from "../pages/ShopCreate";
 import SellerActivationPage from "../pages/SellerActivationPage";
@@ -24,8 +24,8 @@ export {
   BestSellingPage,
   EventsPage,
   FAQPage,
-  // CheckoutPage,
-  // PaymentPage,
+  CheckoutPage,
+  PaymentPage,
   OrderSuccessPage,
   ProductDetailsPage,
   ProfilePage,

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "../../styles/styles";
-import { productData, categoriesData } from "../../static/data";
+import { categoriesData } from "../../static/data";
 import {
   AiOutlineHeart,
   AiOutlineSearch,
@@ -19,7 +19,11 @@ import Wishlist from "../Wishlist/Wishlist";
 import { RxCross1 } from "react-icons/rx";
 
 const Header = ({ activeHeading }) => {
-  const {allProducts} = useSelector((state)=>state.products)
+
+   const { cart } = useSelector((state) => state.cart);  
+  const { wishlist } = useSelector((state) => state.wishlist);
+
+  const { allProducts } = useSelector((state) => state.products);
   const { isAuthenticated, user } = useSelector((state) => state.user);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState(null);
@@ -77,11 +81,9 @@ const Header = ({ activeHeading }) => {
               <div className="absolute min-h[30vh] bg-slate-50 shadow-sm-2 z-[9] p-4 ">
                 {searchData &&
                   searchData.map((i, index) => {
-                    const d = i.name;
-
-                    const Product_name = d.replace(/\s+/g, "-");
+              
                     return (
-                      <Link to={`/product/${Product_name}`}>
+                      <Link to={`/product/${i._id}`}>
                         <div className="w-full flex items-start-py-3">
                           <img
                             src={`${backend_url}${i.images[0]}`}
@@ -147,7 +149,7 @@ const Header = ({ activeHeading }) => {
               >
                 <AiOutlineHeart size={30} color="rgb(255 255 255 / 83%" />
                 <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                  0
+                  {wishlist && wishlist.length}
                 </span>
               </div>
             </div>
@@ -162,7 +164,7 @@ const Header = ({ activeHeading }) => {
                   color="rgb(255 255 255 / 83%"
                 />
                 <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                  2
+                  {cart && cart.length}
                 </span>
               </div>
             </div>
@@ -172,9 +174,17 @@ const Header = ({ activeHeading }) => {
                 {isAuthenticated ? (
                   <Link to="/profile">
                     <img
-                      src={`${backend_url}${user.avatar}`}
+                      src={
+                        user?.avatar
+                          ? typeof user.avatar === "string"
+                            ? user.avatar.startsWith("http")
+                              ? user.avatar
+                              : `${backend_url}${user.avatar}`
+                            : user.avatar.url || ""
+                          : "https://via.placeholder.com/35"
+                      }
                       alt=""
-                      className="w-[35px] h-[35px] rounded-full"
+                      className="w-[35px] h-[35px] rounded-full object-cover"
                     />
                   </Link>
                 ) : (
@@ -221,7 +231,7 @@ const Header = ({ activeHeading }) => {
             <div className="relative mr-[20px] ">
               <AiOutlineShoppingCart size={30} />
               <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right">
-                1
+                {cart && cart.length}
               </span>
             </div>
           </div>
@@ -296,8 +306,16 @@ const Header = ({ activeHeading }) => {
                     <Link to="/profile">
                       <img
                         alt=""
-                        src={`${backend_url}${user.avatar}`}
-                        className="w-[60px] h-[60px] rounded-full border-[3px] border-[#0eae88]"
+                        src={
+                          user?.avatar
+                            ? typeof user.avatar === "string"
+                              ? user.avatar.startsWith("http")
+                                ? user.avatar
+                                : `${backend_url}${user.avatar}`
+                              : user.avatar.url || ""
+                            : "https://via.placeholder.com/60"
+                        }
+                        className="w-[60px] h-[60px] rounded-full border-[3px] border-[#0eae88] object-cover"
                       />
                     </Link>
                   </div>

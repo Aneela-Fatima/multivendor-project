@@ -1,8 +1,8 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "../../styles/styles";
 import { backend_url } from "../../server";
-import {useDispatch,useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getAllProductsShop } from "../../redux/actions/product";
 import {
   AiFillHeart,
@@ -10,22 +10,58 @@ import {
   AiOutlineMessage,
   AiOutlineShoppingCart,
 } from "react-icons/ai";
+import {
+  addToWishlist,
+  removeFromWishlist,
+} from "../../redux/actions/wishlist";
+import { toast } from "react-toastify";
+import { addToCart } from "../../redux/actions/cart";
 
 const ProductDetails = ({ data }) => {
-
+  const { wishlist } = useSelector((state) => state.wishlist);
+  const { cart } = useSelector((state) => state.cart);
+  const { products } = useSelector((state) => state.products);
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
   const [select, setSelect] = useState(0);
   const navigate = useNavigate();
-
-
-  const {products} = useSelector((state)=>state.products);
   const dispatch = useDispatch();
-  useEffect(()=>{
-    dispatch(getAllProductsShop(data._id));
-  },[dispatch,data])
 
-  
+  useEffect(() => {
+    dispatch(getAllProductsShop(data && data?.shop_id));
+    if (wishlist && wishlist.find((i) => i._id === data?._id)) {
+      setClick(true);
+    } else {
+      setClick(false);
+    }
+  }, [dispatch, data, wishlist]);
+
+  const removeFromWishlistHandler = (data) => {
+    setClick(!click);
+    dispatch(removeFromWishlist(data));
+    toast.error("Item removed from wishlist!");
+  };
+
+  const addToWishlistHandler = (data) => {
+    setClick(!click);
+    dispatch(addToWishlist(data));
+    toast.success("Item added to wishlist successfully!");
+  };
+
+  const addToCartHandler = (id) => {
+    const isItemExist = cart && cart.find((i) => i._id === id);
+    if (isItemExist) {
+      toast.error("Item already in cart");
+    } else {
+      if (data.stock < 1) {
+        toast.error("Product stock limited!");
+      } else {
+        const cartData = { ...data, qty: count };
+        dispatch(addToCart(cartData));
+        toast.success("Item added to cart successfully!");
+      }
+    }
+  };
 
   const decrementCount = () => {
     if (count > 1) {
@@ -55,25 +91,22 @@ const ProductDetails = ({ data }) => {
                     className="w-full max-w-[500px] mx-auto object-contain"
                   />
                   <div className="w-full flex gap-3 mt-4 justify-center">
-                    {
-                      data && data.images.map((i,index)=>{
+                    {data &&
+                      data.images.map((i, index) => {
                         <div
-                      className={`${select === 0 ? "border-2 border-blue-500" : "border border-gray-200"} cursor-pointer p-1 rounded-md`}
-                    >
-                      <img
-                        alt=""
-                        src={`${backend_url}${i}`}
-                        className="h-[120px] w-[120px] object-cover rounded-md overflow-hidden mr-3 mt-3"
-                        onClick={() => setSelect(index)}
-                      />
-                    </div>
-                      })
-                    }
+                          className={`${select === 0 ? "border-2 border-blue-500" : "border border-gray-200"} cursor-pointer p-1 rounded-md`}
+                        >
+                          <img
+                            alt=""
+                            src={`${backend_url}${i}`}
+                            className="h-[120px] w-[120px] object-cover rounded-md overflow-hidden mr-3 mt-3"
+                            onClick={() => setSelect(index)}
+                          />
+                        </div>;
+                      })}
                     <div
                       className={`${select === 1 ? "border-2 border-blue-500" : "border border-gray-200"} cursor-pointer p-1 rounded-md`}
-                    >
-                      
-                    </div>
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -123,7 +156,7 @@ const ProductDetails = ({ data }) => {
                       <AiFillHeart
                         size={30}
                         className="cursor-pointer "
-                        onClick={() => setClick(!click)}
+                        onClick={() => removeFromWishlistHandler(data)}
                         color={click ? "red" : "#333"}
                         title="Remove from wishlist"
                       />
@@ -131,7 +164,7 @@ const ProductDetails = ({ data }) => {
                       <AiOutlineHeart
                         size={30}
                         className="cursor-pointer "
-                        onClick={() => setClick(!click)}
+                        onClick={() => addToWishlistHandler(data)}
                         color={click ? "red" : "#333"}
                         title="Add to wishlist"
                       />
@@ -141,6 +174,7 @@ const ProductDetails = ({ data }) => {
 
                 <div
                   className={`${styles.button} mt-6 rounded-[4px] h-11 flex items-center`}
+                  onClick={() => addToCartHandler(data._id)}
                 >
                   <span className="!text-[#fff] flex items-center">
                     Add to cart <AiOutlineShoppingCart className="ml-1" />
@@ -148,15 +182,19 @@ const ProductDetails = ({ data }) => {
                 </div>
 
                 <div className="flex items-center pt-8">
+                  <Link to={`/shop/preview/${data?.shop._id}`}>
                   <img
                     src={`${backend_url}${data?.shop?.avatar}`}
                     alt="Shop Avatar"
                     className="h-[50px] w-[50px] rounded-full mr-2"
                   />
+                  </Link>
                   <div className="pr-8">
+                    <Link to={`/shop/preview/${data?.shop._id}`}>
                     <h3 className={`${styles.shop_name} pb-1 pt-1`}>
                       {data.shop.name}
                     </h3>
+                    </Link>
                     <h5 className="pb-3 text-[15px]">
                       ({data.shop.ratings}) Ratings
                     </h5>
@@ -174,7 +212,7 @@ const ProductDetails = ({ data }) => {
             </div>
           </div>
 
-          <ProductDetailsInfo data={data} products={products}/>
+          <ProductDetailsInfo data={data} products={products} />
           <br />
           <br />
         </div>
@@ -183,7 +221,7 @@ const ProductDetails = ({ data }) => {
   );
 };
 
-const ProductDetailsInfo = ({ data,products } ) => {
+const ProductDetailsInfo = ({ data, products }) => {
   const [active, setActive] = useState(1);
   return (
     <div className=" bg-[#f5f5f5] px-3 800px:px-10  py-2 rounded">
@@ -230,7 +268,6 @@ const ProductDetailsInfo = ({ data,products } ) => {
           <p className="py-2 text-[18px] pb-10 whitespace-pre-line 800:text-[18px] leading-8">
             {data.description}
           </p>
-          
         </>
       ) : null}
 
@@ -244,32 +281,35 @@ const ProductDetailsInfo = ({ data,products } ) => {
         <div className="w-full min-h-[40vh] block 800px:flex p-5">
           <div className="w-full 800px:w-[50%]">
             <Link to={`/shop/preview/${data.shop._id}`}>
-            <div className="flex items-center">
-              <img
-                src={`${backend_url}${data?.shop?.avatar}`}
-                alt=""
-                className="w-[50px] h-[50px] rounded-full"
-              />
-              <div className="pl-[5px]">
-                <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
-                <h5 className="pb-2 text-[15px] ">
-                  {data.shop.ratings} Ratings
-                </h5>
+              <div className="flex items-center">
+                <img
+                  src={`${backend_url}${data?.shop?.avatar}`}
+                  alt=""
+                  className="w-[50px] h-[50px] rounded-full"
+                />
+                <div className="pl-[5px]">
+                  <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
+                  <h5 className="pb-2 text-[15px] ">
+                    {data.shop.ratings} Ratings
+                  </h5>
+                </div>
               </div>
-            </div>
-            
             </Link>
-            <p className="pt-2">
-              {data.shop.description}
-            </p>
+            <p className="pt-2">{data.shop.description}</p>
           </div>
           <div className="w-full 800px:[50%] 800px:mt-0 800px:flex flex-col items-end mt-5">
             <div className="text-left">
               <h5 className="font-[600] ">
-                Joined on: <span className="font-[500]">{data.shop?.createdAt?.slice(0,10)}</span>
+                Joined on:{" "}
+                <span className="font-[500]">
+                  {data.shop?.createdAt?.slice(0, 10)}
+                </span>
               </h5>
               <h5 className="font-[600] pt-3">
-                Total Products: <span className="font-[500]">{products && products.length}</span>
+                Total Products:{" "}
+                <span className="font-[500]">
+                  {products && products.length}
+                </span>
               </h5>
               <h5 className="font-[600] pt-3">
                 Total Reviews: <span className="font-[500]"> 20</span>

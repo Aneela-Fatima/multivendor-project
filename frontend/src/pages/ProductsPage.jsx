@@ -5,10 +5,9 @@ import styles from "../styles/styles";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "../components/Route/ProductCard/ProductCard";
 import { useSelector } from "react-redux";
-import { productData } from "../static/data";
 
 const ProductsPage = () => {
-  const [isLoading,setIsLoading] = useState(false)
+  // const [isLoading,setIsLoading] = useState(false)
   const [searchParams] = useSearchParams();
   const categoryData = searchParams.get("category");
   const {allProducts} = useSelector((state)=>state.products)
@@ -17,7 +16,7 @@ const ProductsPage = () => {
   useEffect(() => {
     if (categoryData === null) {
       const d =
-        allProducts && allProducts.sort((a, b) => a.sold_out - b.sold_out);
+        allProducts && [...allProducts].sort((a, b) => a.sold_out - b.sold_out);
       setData(d);
     } else {
       const d =
@@ -25,7 +24,7 @@ const ProductsPage = () => {
       setData(d);
     }
     //   window.scrollTo(0,0);
-  }, [allProducts]);
+  }, [allProducts,categoryData]);
 
 
   return (
