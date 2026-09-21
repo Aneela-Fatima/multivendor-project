@@ -8,7 +8,7 @@ const { isAuthenticated, isSeller } = require("../middleware/auth");
 
 // Create new order
 router.post(
-  "/create-order", isAuthenticated,
+  "/create-order",
   catchAsyncErrors(async (req, res, next) => {
     try {
       const { cart, shippingAddress, user, totalPrice, paymentInfo } = req.body;
@@ -45,7 +45,7 @@ router.post(
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
-  })
+  }),
 );
 
 // Get all orders for user
@@ -64,7 +64,7 @@ router.get(
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
-  })
+  }),
 );
 
 // Get all orders for seller/shop
@@ -85,7 +85,154 @@ router.get(
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
-  })
+  }),
 );
+
+// update order status for seller
+export const updateStatusOrder = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return next(new ErrorHandler("Order not found with this id", 400));
+    }
+
+    if (req.body.status === "Transferred to delivery partner") {
+      for (const o of order.cart) {
+        await updateProductStock(o._id, o.qty);
+      }
+    }
+
+    order.status = req.body.status;
+
+    if (req.body.status === "Delivered") {
+      order.deliveredAt = Date.now();
+      order.paymentInfo.status = "Succeeded";
+      const serviceCharge = order.totalPrice * 0.1;
+      await updateSellerBalance(order.totalPrice - serviceCharge);
+    }
+
+    await order.save({ validateBeforeSave: false });
+
+    res.status(200).json({
+      success: true,
+      order,
+    });
+    // Helper Functions
+    async function updateProductStock(productId, qty) {
+      const product = await Product.findById(productId);
+      if (product) {
+        product.stock -= qty;
+        product.sold_out += qty;
+        await product.save({ validateBeforeSave: false });
+      }
+    }
+
+    async function updateSellerBalance(amount) {
+      const seller = await Shop.findById(req.seller.id);
+      if (seller) {
+        seller.availableBalance = (seller.availableBalance || 0) + amount;
+        await seller.save();
+      }
+    }
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+// order refund user
+export const orderRefund = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return next(new ErrorHandler("Order not found with this id", 400));
+    }
+
+    order.status = req.body.status;
+
+    await order.save({ validateBeforeSave: false });
+
+    res.status(200).json({
+      success: true,
+      order,
+      message: "Order Refund Request successfully!",
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+
+// refund succcess -- seller
+export const orderRefundSuccess = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return next(new ErrorHandler("Order not found with this id", 400));
+    }
+
+    if (order.status === "Refund Success") {
+      return next(new ErrorHandler("Refund already processed!", 400));
+    }
+
+    order.status = req.body.status;
+    await order.save();
+
+    if (req.body.status === "Refund Success") {
+      for (const o of order.cart) {
+        await updateProductStockOnRefund(o._id, o.qty);
+      }
+      /* Every order belongs to a single shop only (createOrder splits multi-shop carts into separate orders per shop at checkout time),so taking the shopId from the first cart item is safe here.*/
+      const shopId = order.cart[0]?.shopId;
+      if (shopId) {
+        const seller = await Shop.findById(shopId);
+        if (seller) {
+          /* Seller only received 90% at delivery time (10% was admin's commission), so refund only deducts that same 90% share back.*/
+          const refundAmount = order.totalPrice * 0.9;
+          seller.availableBalance =
+            (seller.availableBalance || 0) - refundAmount;
+          await seller.save();
+        }
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Order Refund successful!",
+    });
+
+    async function updateProductStockOnRefund(productId, qty) {
+      const product = await Product.findById(productId);
+      if (product) {
+        product.stock += qty;
+        product.sold_out -= qty;
+        await product.save({ validateBeforeSave: false });
+      }
+    }
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+
+// get all orders --admin
+export const getAllAdminOrders = catchAsyncErrors(async (req, res, next) => {
+  isAdmin("Admin")
+  try {
+    const orders = await Order.find().sort({
+      deliveredAt: -1,
+      createdAt: -1,
+    });
+
+    res.status(200).json({
+      success: true,
+      orders,
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
 
 module.exports = router;

@@ -136,3 +136,24 @@ export const updateUserAddress =
     });
   }
 }
+
+// Get all users (Admin only)
+export const getAllUsers = () => async (dispatch) => {
+  try {
+    dispatch({ type: "getAllUsersRequest" });
+
+    const { data } = await axiosServerInstance.get("/user/admin-all-users", {
+      withCredentials: true,
+    });
+
+    dispatch({
+      type: "getAllUsersSuccess",
+      payload: data.users,
+    });
+  } catch (error) {
+    dispatch({
+      type: "getAllUsersFailed",
+      payload: error.response?.data?.message || "Failed to fetch users",
+    });
+  }
+};

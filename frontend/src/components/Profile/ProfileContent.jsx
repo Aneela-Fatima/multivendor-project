@@ -6,7 +6,7 @@ import {
   AiOutlineCamera,
   AiOutlineDelete,
 } from "react-icons/ai";
-import { MdOutlineTrackChanges } from "react-icons/md";
+import { MdOutlineTrackChanges, MdTrackChanges } from "react-icons/md";
 import styles from "../../styles/styles";
 import { Link } from "react-router-dom";
 import { Button } from "@mui/material";
@@ -76,7 +76,8 @@ const ProfileContent = ({ active }) => {
         withCredentials: true,
       })
       .then((response) => {
-        window.location.reload();
+        dispatch(loadUser())
+        toast.success("avatar updated successfully")
       })
       .catch((error) => {
         toast.error(error);
@@ -217,20 +218,13 @@ const ProfileContent = ({ active }) => {
 };
 
 const AllOrders = () => {
-  const orders = [
-    {
-      id: "1",
-      name: "Product 1",
-      orderItems: [
-        {
-          name: "Product 1",
-          price: 100,
-          quantity: 1,
-        },
-      ],
-      orderStatus: "Processing",
-    },
-  ];
+  const { user } = useSelector((state) => state.user);
+  const { orders } = useSelector((state) => state.order);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAllOrdersOfUser(user._id));
+  }, []);
 
   const coloumns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
@@ -270,7 +264,7 @@ const AllOrders = () => {
       renderCell: (params) => {
         return (
           <>
-            <Link to={`/order/${params.id}`}>
+            <Link to={`/user/order/${params.id}`}>
               <Button>
                 <AiOutlineArrowRight size={20} />
               </Button>
@@ -286,9 +280,9 @@ const AllOrders = () => {
     orders.forEach((item) => {
       row.push({
         id: item.id,
-        itemsQty: item.orderItems.length,
+        itemsQty: item.cart.length,
         total: "US$" + item.totalPrice,
-        status: item.orderStatus,
+        status: item.status,
       });
     });
 
@@ -306,18 +300,16 @@ const AllOrders = () => {
 };
 
 const AllRefundOrders = () => {
-  const orders = [
-    {
-      id: "1",
-      order_items: [
-        {
-          name: "Product 1",
-        },
-      ],
-      totalPrice: 100,
-      orderStatus: "Refunded",
-    },
-  ];
+  const { user } = useSelector((state) => state.user);
+  const { orders } = useSelector((state) => state.order);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAllOrdersOfUser(user._id));
+  }, []);
+
+  const eligibleOrders =
+    orders && orders.filter((item) => item.status === "Processing refund");
 
   const coloumns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
@@ -368,8 +360,8 @@ const AllRefundOrders = () => {
 
   const row = [];
 
-  orders &&
-    orders.forEach((item) => {
+  eligibleOrders &&
+    eligibleOrders.forEach((item) => {
       row.push({
         id: item.id,
         itemsQty: item.order_items.length,
@@ -445,9 +437,9 @@ const TrackOrder = () => {
       renderCell: (params) => {
         return (
           <>
-            <Link to={`/order/${params.id}`}>
+            <Link to={`user/track/order/${params.id}`}>
               <Button>
-                <MdOutlineTrackChanges size={20} />
+                <MdTrackChanges size={20} />
               </Button>
             </Link>
           </>
@@ -496,15 +488,14 @@ const ChangePassword = () => {
       )
       .then((res) => {
         toast.success("res.data.success");
-        setOldPassword("")
-        setNewPassword("")
-        setConfirmPassword("")
-
-      }).catch((error)=>{
-        toast.error(error.res.data.message)
+        setOldPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
       })
+      .catch((error) => {
+        toast.error(error.res.data.message);
+      });
   };
-
 
   return (
     <div className="w-full px-5">
@@ -592,7 +583,14 @@ const Address = () => {
       toast.error("Please fill all fields");
     } else {
       dispatch(
-        updateUserAddress(country, city, address1, address2, zipCode, addressType),
+        updateUserAddress(
+          country,
+          city,
+          address1,
+          address2,
+          zipCode,
+          addressType,
+        ),
       );
 
       setOpen(false);

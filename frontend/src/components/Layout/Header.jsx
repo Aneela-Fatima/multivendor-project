@@ -19,7 +19,6 @@ import Wishlist from "../Wishlist/Wishlist";
 import { RxCross1 } from "react-icons/rx";
 
 const Header = ({ activeHeading }) => {
-
    const { cart } = useSelector((state) => state.cart);  
   const { wishlist } = useSelector((state) => state.wishlist);
 

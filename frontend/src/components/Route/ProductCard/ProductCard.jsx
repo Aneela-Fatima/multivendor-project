@@ -18,7 +18,7 @@ import {
 } from "react-icons/ai";
 import { addToCart } from "../../../redux/actions/cart";
 
-const ProductCard = ({ data }) => {
+const ProductCard = ({ data,isEvent }) => {
   const {wishlist} = useSelector((state)=>state.wishlist)
   const { cart } = useSelector((state) => state.cart);
   const [click, setClick] = useState(false);
@@ -77,7 +77,7 @@ const ProductCard = ({ data }) => {
     <>
       <div className="w-full h-[370px] bg-white rounded-lg shadow-sm p-3 cursor-pointer relative">
         <div classname="flex justify-end "></div>
-        <Link to={`/product/${data._id}`}>
+        <Link to={`${isEvent === true ? `/product/\${data._id}?isEvent=true` : `/product/\${data._id}`}`}>
           {imageUrl ? (
             <img
               src={imageUrl}
@@ -86,7 +86,7 @@ const ProductCard = ({ data }) => {
             />
           ) : null}
         </Link>
-        <Link to={`/shop/preview/${data?.shop._id}`}>
+        <Link to={`${isEvent === true ? `/product/\${data._id}?isEvent=true` : `/product/\${data._id}`}`}>
           <h5 className={`${styles.shop_name}`}>{shopName}</h5>
         </Link>
         <Link to={`/product/${data._id}`}>
@@ -97,31 +97,7 @@ const ProductCard = ({ data }) => {
           </h4>
 
           <div className="flex">
-            <AiFillStar
-              className="mr-2 cursor-pointer"
-              color="#F6BA00"
-              size={20}
-            />
-            <AiFillStar
-              className="mr-2 cursor-pointer"
-              color="#F6BA00"
-              size={20}
-            />
-            <AiFillStar
-              className="mr-2 cursor-pointer"
-              color="#F6BA00"
-              size={20}
-            />
-            <AiFillStar
-              className="mr-2 cursor-pointer"
-              color="#F6BA00"
-              size={20}
-            />
-            <AiOutlineStar
-              className="mr-2 cursor-pointer"
-              color="#F6BA00"
-              size={20}
-            />
+            <Ratings ratings={data?.ratings}/>
           </div>
 
           <div className="py-2 flex items-center justify-between">
@@ -134,7 +110,7 @@ const ProductCard = ({ data }) => {
               </h4>
             </div>
             <span className="font-[400] text-[17px] text-[#68d284]">
-              {data.sold_out}
+              {data?.sold_out} sold
             </span>
           </div>
         </Link>

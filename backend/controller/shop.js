@@ -205,4 +205,159 @@ router.get("./get-sop-info/:id",catchAsyncErrors(async(req,res,next)=>{
     return next(new ErrorHandler(error.message, 500));
   }
 }))
+
+
+// update shop avatar
+export const updateShopAvatar = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const seller = await Shop.findById(req.seller.id);
+
+    if (!seller) {
+      return next(new ErrorHandler("Shop not found", 404));
+    }
+
+    // Delete old avatar from Cloudinary
+    if (seller.avatar?.public_id) {
+      await cloudinary.uploader.destroy(seller.avatar.public_id);
+    }
+
+    const result = await uploadToCloudinary(
+      req.file.buffer,
+      "sahiwal-electronics/shops",
+    );
+
+    seller.avatar = {
+      public_id: result.public_id,
+      url: result.secure_url,
+    };
+       await seller.save();
+
+    // Update all products of this shop with new shop info
+    await Product.updateMany(
+      { shopId: seller._id.toString() },
+      { $set: { shop: seller } },
+    );
+
+    res.status(200).json({
+      success: true,
+      seller,
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+// update seller info
+export const updateShopInfo = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const { name, description, address, phoneNumber, zipCode } = req.body;
+
+    const seller = await Shop.findById(req.seller.id);
+
+    if (!seller) {
+      return next(new ErrorHandler("Shop not found", 404));
+    }
+
+    seller.name = name || seller.name;
+    seller.description = description || seller.description;
+    seller.address = address || seller.address;
+    seller.phoneNumber = phoneNumber || seller.phoneNumber;
+    seller.zipCode = zipCode || seller.zipCode;
+
+    await seller.save();
+    await Product.updateMany(
+      { shopId: seller._id.toString() },
+      { $set: { shop: seller } },
+    );
+    res.status(200).json({
+      success: true,
+      seller,
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+
+// get all sellers ---- admin only
+export const getAllSellers = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const sellers = await Shop.find().sort({ createdAt: -1 });
+    res.status(200).json({
+      success: true,
+      sellers,
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+// DELETE SELLER (ADMIN ONLY)
+export const deleteSeller = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const seller = await Shop.findById(req.params.id);
+    if (!seller) {
+      return next(new ErrorHandler("Seller not found with this id", 404));
+    }
+
+    // Delete seller avatar from local storage
+    if (seller.avatar?.public_id) {
+      await cloudinary.uploader.destroy(seller.avatar.public_id);
+    }
+
+    await Shop.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Seller deleted successfully!",
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+// UPDATE PAYMENT METHODS (SELLER ONLY)
+export const updatePaymentMethods = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const { withdrawMethod } = req.body;
+
+    const seller = await Shop.findById(req.seller._id);
+
+    if (!seller) {
+      return next(new ErrorHandler("Shop not found", 404));
+    }
+
+    seller.withdrawMethod = withdrawMethod;
+    await seller.save();
+
+    res.status(200).json({
+      success: true,
+      seller,
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+// DELETE WITHDRAW METHOD (SELLER ONLY)
+export const deleteWithdrawMethod = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const seller = await Shop.findById(req.seller._id);
+
+    if (!seller) {
+      return next(new ErrorHandler("Shop not found", 404));
+    }
+
+    seller.withdrawMethod = null;
+    await seller.save();
+
+    res.status(200).json({
+      success: true,
+      seller,
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
 module.exports = router;

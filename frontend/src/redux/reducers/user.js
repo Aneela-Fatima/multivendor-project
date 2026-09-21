@@ -62,6 +62,20 @@ export const userReducer = createReducer(initialState, (builder) => {
       state.successMessage = action.payload?.successMessage || null;
       state.error = action.payload;
     })
+    
+
+     // Admin - Get all users
+    .addCase("getAllUsersRequest", (state) => {
+      state.usersLoading = true;
+    })
+    .addCase("getAllUsersSuccess", (state, action) => {
+      state.usersLoading = false;
+      state.users = action.payload;
+    })
+    .addCase("getAllUsersFailed", (state, action) => {
+      state.usersLoading = false;
+      state.error = action.payload;
+    })
 
     .addCase("clearErrors", (state) => {
       state.error = null;
