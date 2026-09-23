@@ -17,6 +17,7 @@ import {
   AiOutlineStar,
 } from "react-icons/ai";
 import { addToCart } from "../../../redux/actions/cart";
+import Ratings from "../../Products/Ratings";
 
 const ProductCard = ({ data,isEvent }) => {
   const {wishlist} = useSelector((state)=>state.wishlist)
@@ -72,11 +73,18 @@ const ProductCard = ({ data,isEvent }) => {
 
   const imageUrl = data.images?.[0] ? `${backend_url}${data.images[0]}` : "";
   const shopName = data.shop?.name || "Shop";
+  const reviewCount = data.reviews?.length || 0;
+  const reviewRating =
+    data.reviews?.reduce(
+      (total, review) => total + Number(review.rating || 0),
+      0,
+    ) || 0;
+  const averageRating = data.rating || (reviewCount ? reviewRating / reviewCount : 0);
 
   return (
     <>
       <div className="w-full h-[370px] bg-white rounded-lg shadow-sm p-3 cursor-pointer relative">
-        <div classname="flex justify-end "></div>
+        <div className="flex justify-end "></div>
         <Link to={`${isEvent === true ? `/product/\${data._id}?isEvent=true` : `/product/\${data._id}`}`}>
           {imageUrl ? (
             <img
@@ -97,7 +105,7 @@ const ProductCard = ({ data,isEvent }) => {
           </h4>
 
           <div className="flex">
-            <Ratings ratings={data?.ratings}/>
+            <Ratings rating={averageRating} />
           </div>
 
           <div className="py-2 flex items-center justify-between">

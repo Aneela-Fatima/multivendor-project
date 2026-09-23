@@ -111,7 +111,7 @@ router.get(
 );
 
 // GET ALL EVENTS (ADMIN ONLY)
-export const getAllAdminEvents = catchAsyncErrors(async (req, res, next) => {
+const getAllAdminEvents = catchAsyncErrors(async (req, res, next) => {
   try {
     const events = await Event.find().sort({ createdAt: -1 });
 

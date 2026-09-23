@@ -1,6 +1,6 @@
-import React from 'react'
-import AdminSideBar from '../../components/Admin/AdminSideBar.jsx';
-import AdminAllOrders from '../../components/Admin/AdminAllOrders.jsx';
+import React from "react";
+import AdminSideBar from "../components/Admin/Layout/AdminSideBar.jsx";
+import AdminAllOrders from "../components/Admin/AdminAllOrders.jsx";
 
 const AdminAllOrderspage = () => {
   return (
@@ -15,6 +15,6 @@ const AdminAllOrderspage = () => {
       </div>
     </div>
   );
-}
+};
 
-export default AdminAllOrderspage
+export default AdminAllOrderspage;

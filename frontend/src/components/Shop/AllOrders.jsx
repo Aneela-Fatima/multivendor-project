@@ -1,5 +1,5 @@
-import { Button } from "@material-ui/core";
-import { DataGrid } from "@material-ui/data-grid";
+import { Button } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -25,10 +25,8 @@ const AllOrders = () => {
       minWidth: 130,
       flex: 0.7,
       cellClassName: (params) => {
-        return params.getValue(params.id, "status") === "Delivered"
-          ? "greenColor"
-          : "redColor";
-           },
+        return params.value === "Delivered" ? "greenColor" : "redColor";
+      },
     },
     {
       field: "itemsQty",
@@ -37,7 +35,7 @@ const AllOrders = () => {
       minWidth: 130,
       flex: 0.7,
     },
- {
+    {
       field: "total",
       headerName: "Total",
       type: "number",
@@ -51,7 +49,7 @@ const AllOrders = () => {
       minWidth: 150,
       headerName: "",
       type: "number",
-       sortable: false,
+      sortable: false,
       renderCell: (params) => {
         return (
           <>
@@ -77,7 +75,7 @@ const AllOrders = () => {
         status: item.status,
       });
     });
-     return (
+  return (
     <>
       {isLoading ? (
         <Loader />

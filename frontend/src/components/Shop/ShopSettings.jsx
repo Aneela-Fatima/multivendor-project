@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { backend_url, axiosServerInstance } from "../../server.js";
 import { AiOutlineCamera } from "react-icons/ai";
 import styles from "../../styles/styles.js";
-import { loadSeller } from "../../redux/actions/seller.js";
+import { loadSeller } from "../../redux/actions/user.js";
 import { toast } from "react-toastify";
-import Loader from "../Common/Loader.jsx";
+import Loader from "../Layout/Loader.jsx";
 
 const SellerSettings = () => {
   const dispatch = useDispatch();
@@ -89,6 +89,12 @@ const SellerSettings = () => {
     zipCode: seller?.zipCode || "",
     avatar: seller?.avatar || { url: "" },
   };
+  const avatarUrl = safeSeller.avatar?.url || safeSeller.avatar;
+  const imageUrl = avatarUrl
+    ? avatarUrl.startsWith("http")
+      ? avatarUrl
+      : `${backend_url}${avatarUrl.replace(/^\//, "")}`
+    : "";
 
   const inputClass = `${styles.input} !w-full`;
   const labelClass = "block pb-2 font-body font-medium text-ink";
@@ -102,7 +108,7 @@ const SellerSettings = () => {
               src={
                 avatar
                   ? URL.createObjectURL(avatar)
-                  : `${backend_url}${safeSeller.avatar?.url}`
+                  : imageUrl
               }
               alt="Shop Avatar"
               className="w-[150px] h-[150px] rounded-full object-cover border-4 border-divider"
@@ -200,10 +206,10 @@ const SellerSettings = () => {
             <button
               type="submit"
               disabled={isUpdating}
-              className={`${styles.button} !w-full !h-[45px] ${
+              className={`${styles.button} !w-full text-white !h-[45px] ${
                 isUpdating ? "opacity-50 cursor-not-allowed" : ""
               }`}
-            >
+            >Update shop
               {isUpdating ? "Updating..." : "Update Shop"}
             </button>
           </div>

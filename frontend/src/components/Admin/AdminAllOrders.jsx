@@ -2,12 +2,12 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DataGrid } from "@mui/x-data-grid";
 import { getAllOrdersOfAdmin } from "../../redux/actions/order.js";
-import Loader from "../Common/Loader.jsx";
+import Loader from "../Layout/Loader.jsx";
 
 const AdminAllOrders = () => {
   const dispatch = useDispatch();
   const { adminOrders, adminOrderLoading, error } = useSelector(
-    (state) => state.orders
+    (state) => state.orders,
   );
 
   useEffect(() => {
@@ -68,7 +68,9 @@ const AdminAllOrders = () => {
   if (error) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
-        <p className="text-copper font-body text-lg">Failed to load orders: {error}</p>
+        <p className="text-copper font-body text-lg">
+          Failed to load orders: {error}
+        </p>
       </div>
     );
   }

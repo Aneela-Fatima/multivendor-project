@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Header from "../components/Layout/Header";
 import Footer from "../components/Layout/Footer";
 import ProductDetails from "../components/Products/ProductDetails";
-import { useParams } from "react-router-dom";
+import { useParams,useSearchParams } from "react-router-dom";
 import SuggestedProduct from "../components/Products/SuggestedProduct";
 import { useSelector } from "react-redux";
 
@@ -11,7 +11,7 @@ const ProductDetailsPage = () => {
   const { allEvents } = useSelector((state) => state.products);
   const { id } = useParams();
   const [data, setData] = useState(null);
-  onst[searchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const eventData = searchParams.get("isEvent");
 
   useEffect(() => {

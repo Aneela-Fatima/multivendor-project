@@ -3,23 +3,28 @@ import React from "react";
 import { useEffect } from "react";
 import { backend_url, server } from "../../server";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import styles from "../../styles/styles";
+import { AiOutlineArrowRight, AiOutlineSend } from "react-icons/ai";
+import { TfiGallery } from "react-icons/tfi";
 import socketIO from "socket.io-client";
 import { useState } from "react";
-const ENDPOINT = "http://localhost:4000/";
 import { format } from "timeago.js";
+const ENDPOINT = "http://localhost:4000/";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
+const DEFAULT_AVATAR =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect width='50' height='50' fill='%23dbe2ea'/%3E%3Ccircle cx='25' cy='19' r='9' fill='%236b7280'/%3E%3Cpath d='M9 47c2-10 30-10 32 0' fill='%236b7280'/%3E%3C/svg%3E";
 
 const DashboardMessages = () => {
   const { seller } = useSelector((state) => state.seller);
-  const { user } = useSelector((state) => state.user);
   const [conversations, setConversations] = useState([]);
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const [messages, setMessages] = useState(null);
   const [currentChat, setCurrentChat] = useState(null);
-  const [newMessage, setNewMesssage] = useState("");
+  const [newMessage, setNewMessage] = useState("");
   const [open, setOpen] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [onlineUsers, setOnineUsers] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const [activeStatus, setActiveStatus] = useState(false);
   const [images, setImages] = useState();
 
@@ -40,6 +45,7 @@ const DashboardMessages = () => {
   }, [arrivalMessage, currentChat]);
 
   useEffect(() => {
+    if (!seller?._id) return;
     axios
       .get(
         `${server}/conversation/get-all-conversation-seller/${seller?._id}`,
@@ -64,17 +70,19 @@ const DashboardMessages = () => {
   }, [seller]);
 
   const onlineCheck = (chat) => {
-    const chatMembers = chat.members.find((member) => member !== seller?._id);
+    const chatMembers = chat?.members?.find((member) => member !== seller?._id);
     const online = onlineUsers.find((user) => user.userId === chatMembers);
     return online ? true : false;
   };
 
   // get messages
   useEffect(() => {
+    if (!currentChat?._id) return;
     const getMessage = async () => {
       try {
         const response = await axios.get(
-          `${server}/message/get-all-messages/${currentChat?._id}`,
+          `${server}/message/get-all-messages/${currentChat._id}`,
+          { withCredentials: true },
         );
         setMessages(response.data.messages);
       } catch (error) {
@@ -87,6 +95,7 @@ const DashboardMessages = () => {
   // create new message
   const sendMessageHandler = async (e) => {
     e.preventDefault();
+    if (!seller?._id || !currentChat?._id || !newMessage.trim()) return;
 
     const message = {
       sender: seller._id,
@@ -94,7 +103,7 @@ const DashboardMessages = () => {
       conversationId: currentChat._id,
     };
     const receiverId = currentChat.members.find(
-      (member) => member.id !== seller._id,
+      (member) => member !== seller._id,
     );
 
     socketId.emit("sendMessage", {
@@ -106,7 +115,9 @@ const DashboardMessages = () => {
     try {
       if (newMessage !== "") {
         await axios
-          .post(`${server}/message/create-new-message`, message)
+          .post(`${server}/message/create-new-message`, message, {
+            withCredentials: true,
+          })
           .then((res) => {
             setMessages([...messages, res.data.message]);
             updateLastMessage();
@@ -151,6 +162,8 @@ const DashboardMessages = () => {
 
     formData.append("images", e);
     formData.append("sender", seller._id);
+  if (!seller?._id) return null;
+
     formData.append("text", newMessage);
     formData.append("conversationId", currentChat._id);
 
@@ -165,7 +178,9 @@ const DashboardMessages = () => {
     });
     try {
       await axios
-        .post(`${server}/message/create-new-message`, formData)
+        .post(`${server}/message/create-new-message`, formData, {
+          withCredentials: true,
+        })
         .then((res) => {
           setImages();
           setMessages([...messages, res.data.message]);
@@ -183,6 +198,7 @@ const DashboardMessages = () => {
         lastMessage: "Photo",
         lastMessageId: seller._id,
       },
+      { withCredentials: true },
     );
   };
 
@@ -216,7 +232,7 @@ const DashboardMessages = () => {
         <SellerInbox
           setOpen={setOpen}
           newMessage={newMessage}
-          setNewMesssage={setNewMesssage}
+          setNewMessage={setNewMessage}
           sendMessageHandler={sendMessageHandler}
           messages={messages}
           sellerId={seller._id}
@@ -237,12 +253,11 @@ const MessageList = ({
   setOpen,
   setCurrentChat,
   me,
-  setuserData,
-  userData,
+  setUserData,
   online,
   setActiveStatus,
 }) => {
-  const [user, setUser] = useState([]);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const handleClick = (id) => {
     navigate(`?${id}`);
@@ -252,7 +267,8 @@ const MessageList = ({
 
   useEffect(() => {
     setActiveStatus(online);
-    const userId = data.members.find((user) => user !== me);
+    const userId = data?.members?.find((member) => member !== me);
+    if (!userId) return;
 
     const getUser = async () => {
       try {
@@ -264,7 +280,7 @@ const MessageList = ({
       }
     };
     getUser();
-  }, [me, data]);
+  }, [me, data, online, setActiveStatus]);
 
   return (
     <div
@@ -281,7 +297,14 @@ const MessageList = ({
     >
       <div className="relative">
         <img
-          src={`${backend_url}${user?.avatar}`}
+          src={
+            user?.avatar?.url ||
+            (typeof user?.avatar === "string"
+              ? user.avatar.startsWith("http")
+                ? user.avatar
+                : `${backend_url}${user.avatar.replace(/^\//, "")}`
+              : DEFAULT_AVATAR)
+          }
           alt=""
           className="w-[50px] h-[50px] rounded-full"
         />
@@ -294,9 +317,9 @@ const MessageList = ({
       <div className="pl-3">
         <h1 className="text-[18px]">{user?.name}</h1>
         <p className="text-[16px] text-[#000c]">
-          {data.lastMessageId !== userData._id
+          {data.lastMessageId !== user?._id
             ? "You:"
-            : userData?.name.split(" ")[0] + ":"}{" "}
+            : `${user?.name?.split(" ")[0] || "User"}:`} {" "}
           {data?.lastMessage}
         </p>
       </div>
@@ -307,7 +330,7 @@ const MessageList = ({
 const SellerInbox = ({
   setOpen,
   newMessage,
-  setNewMesssage,
+  setNewMessage,
   sendMessageHandler,
   messages,
   sellerId,
@@ -359,6 +382,7 @@ const SellerInbox = ({
               {item.images && (
                 <img
                   src={`${backend_url}${item.images}`}
+                  alt="Message attachment"
                   className="w-[300px] h-[300px] object-cover rounded-[10px] mr-2"
                 />
               )}
@@ -381,7 +405,6 @@ const SellerInbox = ({
       </div>
       {/* send message input */}
       <form
-        aria-required={true}
         className="p-3 relative w-full flex justify-between items-center"
         onSubmit={sendMessageHandler}
       >
@@ -402,7 +425,7 @@ const SellerInbox = ({
             type="text"
             required
             value={newMessage}
-            onChange={(e) => setNewMesssage(e.target.value)}
+            onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Enter your message..."
             className={`${styles.input}`}
           />

@@ -9,7 +9,7 @@ import styles from "../../styles/styles.js";
 import { RxCross1 } from "react-icons/rx";
 import { axiosServerInstance } from "../../server.js";
 import { toast } from "react-toastify";
-import Loader from "../Common/Loader.jsx";
+import Loader from "../Layout/Loader.jsx";
 
 const AdminAllUsers = () => {
   const dispatch = useDispatch();
@@ -91,10 +91,11 @@ const AdminAllUsers = () => {
       sortable: false,
       renderCell: (params) => {
         return (
-          <Button
-            onClick={() => openDeleteConfirmation(params.row.id)}
-          >
-            <AiOutlineDelete size={20} className="text-copper hover:text-copper/70 transition-colors" />
+          <Button onClick={() => openDeleteConfirmation(params.row.id)}>
+            <AiOutlineDelete
+              size={20}
+              className="text-copper hover:text-copper/70 transition-colors"
+            />
           </Button>
         );
       },
@@ -121,7 +122,9 @@ const AdminAllUsers = () => {
   if (error) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
-        <p className="text-copper font-body text-lg">Failed to load users: {error}</p>
+        <p className="text-copper font-body text-lg">
+          Failed to load users: {error}
+        </p>
       </div>
     );
   }

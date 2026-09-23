@@ -54,12 +54,12 @@ const Payment = () => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center py-8 bg-surface min-h-screen">
-      <div className="w-[90%] 1000px:w-[70%] block 800px:flex gap-8">
-        <div className="w-full 800px:w-[65%]">
+    <div className="w-full flex flex-col items-center py-8 800px:py-12 bg-surface min-h-screen">
+      <div className="w-[92%] max-w-[1120px] block 800px:flex gap-6 1000px:gap-10">
+        <div className="w-full 800px:w-[64%]">
           <PaymentInfo cashOnDeliveryHandler={cashOnDeliveryHandler} />
         </div>
-        <div className="w-full 800px:w-[35%] 800px:mt-0 mt-8">
+        <div className="w-full 800px:w-[36%] 800px:mt-0 mt-6">
           <PaymentCartData orderData={orderData} />
         </div>
       </div>

@@ -8,6 +8,10 @@ import { CiMoneyBill, CiSettings } from "react-icons/ci";
 import { Link } from "react-router-dom";
 import { BiMessageSquareDetail } from "react-icons/bi";
 import { HiOutlineReceiptRefund } from "react-icons/hi";
+import { GrWorkshop } from "react-icons/gr";
+import { HiOutlineUserGroup } from "react-icons/hi2";
+import { BsHandbag } from "react-icons/bs";
+import { AiOutlineSetting } from "react-icons/ai";
 
 const AdminSideBar = ({ active }) => {
   return (

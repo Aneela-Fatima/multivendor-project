@@ -416,7 +416,7 @@ router.get(
 );
 
 // GET ALL USERS (ADMIN ONLY)
-export const getAllUsers = catchAsyncErrors(async (req, res, next) => {
+const getAllUsers = catchAsyncErrors(async (req, res, next) => {
   try {
     const users = await User.find().sort({ createdAt: -1 });
 
@@ -431,7 +431,7 @@ export const getAllUsers = catchAsyncErrors(async (req, res, next) => {
 
 
 // DELETE USER (ADMIN ONLY)
-export const deleteUser = catchAsyncErrors(async (req, res, next) => {
+const deleteUser = catchAsyncErrors(async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
 

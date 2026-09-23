@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loadSeller } from "../../redux/actions/seller.js";
+import { loadSeller } from "../../redux/actions/user.js";
 import styles from "../../styles/styles.js";
 import { RxCross1 } from "react-icons/rx";
 import { AiOutlineDelete } from "react-icons/ai";
 import { axiosServerInstance } from "../../server.js";
 import { toast } from "react-toastify";
-import Loader from "../Common/Loader.jsx";
+import Loader from "../Layout/Loader.jsx";
 
 const ShopWithDrawMoney = () => {
   const dispatch = useDispatch();
@@ -143,7 +143,9 @@ const ShopWithDrawMoney = () => {
           Available Balance:{" "}
           <span className="text-copper">${availableBalance.toFixed(2)}</span>
         </h5>
-        <p className="text-sm font-body text-ink/50 mb-4">Minimum withdrawal: $50</p>
+        <p className="text-sm font-body text-ink/50 mb-4">
+          Minimum withdrawal: $50
+        </p>
         <button
           className={`${styles.button} !h-[42px] !rounded px-8 ${
             availableBalance < 50 ? "opacity-50 cursor-not-allowed" : ""
@@ -158,6 +160,15 @@ const ShopWithDrawMoney = () => {
           disabled={availableBalance < 50}
         >
           Withdraw
+        </button>
+        <button
+          className={`${styles.button} !h-[42px] !rounded px-8 mt-3 !bg-slate-200 !text-ink`}
+          onClick={() => {
+            setOpen(true);
+            setPaymentMethod(true);
+          }}
+        >
+          {seller?.withdrawMethod ? "Update Payment Method" : "Add Payment Method"}
         </button>
       </div>
 
@@ -241,8 +252,7 @@ const ShopWithDrawMoney = () => {
 
                   <div>
                     <label className="block text-sm font-body font-medium text-ink">
-                      Bank Account Number{" "}
-                      <span className="text-copper">*</span>
+                      Bank Account Number <span className="text-copper">*</span>
                     </label>
                     <input
                       type="text"

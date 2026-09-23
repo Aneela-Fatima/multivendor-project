@@ -7,17 +7,22 @@ export const loadUser = () => async (dispatch) => {
     dispatch({
       type: "LoaduserRequest",
     });
-    const { data } = await axios.get(`${server}/user/getuser`, {
+    const response = await axios.get(`${server}/user/getuser`, {
       withCredentials: true,
+      validateStatus: (status) => status < 500,
     });
+    if (response.status !== 200 || !response.data?.user) {
+      dispatch({ type: "LoadUserFail", payload: null });
+      return;
+    }
     dispatch({
       type: "LoadUserSuccess",
-      payload: data.user,
+      payload: response.data.user,
     });
   } catch (error) {
     dispatch({
       type: "LoadUserFail",
-      payload: error.response.data.message,
+      payload: error.response?.data?.message || "",
     });
   }
 };
@@ -28,17 +33,22 @@ export const loadSeller = () => async (dispatch) => {
     dispatch({
       type: "LoadSellerRequest",
     });
-    const { data } = await axios.get(`${server}/shop/getSeller`, {
+    const response = await axios.get(`${server}/shop/getSeller`, {
       withCredentials: true,
+      validateStatus: (status) => status < 500,
     });
+    if (response.status !== 200 || !response.data?.seller) {
+      dispatch({ type: "LoadSellerFail", payload: null });
+      return;
+    }
     dispatch({
       type: "LoadSellerSuccess",
-      payload: data.seller,
+      payload: response.data.seller,
     });
   } catch (error) {
     dispatch({
       type: "LoadSellerFail",
-      payload: error.response.data.message,
+      payload: error.response?.data?.message || "",
     });
   }
 };
@@ -142,7 +152,7 @@ export const getAllUsers = () => async (dispatch) => {
   try {
     dispatch({ type: "getAllUsersRequest" });
 
-    const { data } = await axiosServerInstance.get("/user/admin-all-users", {
+    const { data } = await server.get("/user/admin-all-users", {
       withCredentials: true,
     });
 

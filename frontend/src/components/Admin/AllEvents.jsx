@@ -4,17 +4,17 @@ import { Link } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
 import { Button } from "@mui/material";
 import { AiOutlineEye } from "react-icons/ai";
-import { getAllAdminEvents } from "../../redux/actions/event.js";
-import Loader from "../Common/Loader.jsx";
+import { getAllEvents } from "../../redux/actions/event.js";
+import Loader from "../Layout/Loader.jsx";
 
 const AdminAllEvents = () => {
   const dispatch = useDispatch();
-  const { adminEvents, adminEventsLoading, error } = useSelector(
-    (state) => state.events
+  const { allEvents, isLoading, error } = useSelector(
+    (state) => state.events,
   );
 
   useEffect(() => {
-    dispatch(getAllAdminEvents());
+    dispatch(getAllEvents());
   }, [dispatch]);
 
   const columns = [
@@ -31,7 +31,11 @@ const AdminAllEvents = () => {
       minWidth: 120,
       flex: 0.6,
       renderCell: (params) => {
-        return <span className="price-tag text-voltage text-[15px]">${params.row.price}</span>;
+        return (
+          <span className="price-tag text-voltage text-[15px]">
+            ${params.row.price}
+          </span>
+        );
       },
     },
     {
@@ -68,7 +72,10 @@ const AdminAllEvents = () => {
         return (
           <Link to={`/product/${params.row.id}?isEvent=true`}>
             <Button>
-              <AiOutlineEye size={20} className="text-voltage hover:text-voltage/70 transition-colors" />
+              <AiOutlineEye
+                size={20}
+                className="text-voltage hover:text-voltage/70 transition-colors"
+              />
             </Button>
           </Link>
         );
@@ -77,7 +84,7 @@ const AdminAllEvents = () => {
   ];
 
   const rows =
-    adminEvents?.map((item) => ({
+    allEvents?.map((item) => ({
       id: item._id,
       name: item.name || "N/A",
       price: item.discountPrice || item.originalPrice || 0,
@@ -86,7 +93,7 @@ const AdminAllEvents = () => {
       category: item.category || "Uncategorized",
     })) || [];
 
-  if (adminEventsLoading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
         <Loader />
@@ -97,7 +104,9 @@ const AdminAllEvents = () => {
   if (error) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
-        <p className="text-copper font-body text-lg">Failed to load events: {error}</p>
+        <p className="text-copper font-body text-lg">
+          Failed to load events: {error}
+        </p>
       </div>
     );
   }

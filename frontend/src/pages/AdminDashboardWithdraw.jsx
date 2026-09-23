@@ -1,6 +1,6 @@
 import React from "react";
-import AdminSideBar from "../../components/Admin/AdminSideBar.jsx";
-import AdminAllWithdraws from "../../components/Admin/AdminAllWithdraws.jsx";
+import AdminSideBar from "../components/Admin/Layout/AdminSideBar.jsx";
+import AdminAllWithdraws from "../components/Admin/AdminAllWithdraws.jsx";
 
 const AdminAllWithdrawsPage = () => {
   return (

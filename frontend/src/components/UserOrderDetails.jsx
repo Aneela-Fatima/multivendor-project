@@ -1,15 +1,19 @@
-import React, { useState } from "react";
-import styles from "../../styles/styles";
+import React, { useState,useEffect } from "react";
+import axios from "axios"
+import styles from "../styles/styles";
 import { BsFillBagFill } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import {RxCross1} from "react-icons/rx"
+import {AiOutlineStar,AiFillStar} from "react-icons/ai"
+import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { backend_url } from "../../server";
+import { backend_url } from "../server";
 import { getAllOrdersOfUser } from "../redux/actions/order";
+import {server } from "../server"
+import {toast} from "react-toastify"
 
 const UserOrderDetails = () => {
   const { orders } = useSelector((state) => state.order);
   const { user } = useSelector((state) => state.user);
-  const { seller } = useSelector((state) => state.seller);
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
   const [comment, setComment] = useState("");
@@ -35,30 +39,36 @@ const UserOrderDetails = () => {
         toast.success(res.data.message);
         dispatch(getAllOrdersOfUser(user._id));
         setComment("");
-        setRating("");
+        setRating(1);
         setOpen(false);
       })
       .catch((error) => {
-        toast.error(error);
+        toast.error(
+          error.response?.data?.message || "Failed to submit review",
+        );
       });
   };
 
   const refundHandler = async () => {
-    await axios.put(`${server}/order/order-refund/${id}`,{
-        status: "Processing refund"
-    }).then((res) => {
+    await axios
+      .put(`${server}/order/order-refund/${id}`, {
+        status: "Processing refund",
+      })
+      .then((res) => {
         toast.success(res.data.message);
-    }).catch((error) => {
-        toast.error(error.response.data.message)
-    })
-};
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message);
+      });
+  };
 
   useEffect(() => {
-    dispatch(getAllOrdersOfUser(seller._id));
-  }, [dispatch]);
+    if (user?._id) {
+      dispatch(getAllOrdersOfUser(user._id));
+    }
+  }, [dispatch, user?._id]);
 
   const data = orders && orders.find((item) => item._id === id);
-
 
   return (
     <div className={`py-4 min-h-screen ${styles.section}`}>
@@ -95,10 +105,13 @@ const UserOrderDetails = () => {
                 US${item.discountPrice} X {item.qty}
               </h5>
             </div>
-            {data?.status === "Delivered" && (
+            {data?.status === "Delivered" && !item.isReviewed && (
               <div
                 className={`${styles.button} text-[#fff]`}
-                onClick={() => setOpen(true) || setSelectedItem(item)}
+                onClick={() => {
+                  setSelectedItem(item);
+                  setOpen(true);
+                }}
               >
                 Write a review
               </div>
@@ -179,10 +192,10 @@ const UserOrderDetails = () => {
                 className="mt-2 w-[95%] border p-2 outline-none"
               ></textarea>
             </div>
-            {item.isReviewed ? null : (
+            {selectedItem?.isReviewed ? null : (
               <div
                 className={`${styles.button} text-white text-[20px] ml-3`}
-                onClick={rating > 1 ? reviewHandler : null}
+                onClick={rating >= 1 ? reviewHandler : null}
               >
                 Submit
               </div>
@@ -202,36 +215,40 @@ const UserOrderDetails = () => {
         <div className="w-full 800px:w-[60%]">
           <h4 className="pt-3 text-[20px] font-[600]">Shipping Address:</h4>
           <h4 className="pt-3 text-[20px]">
-            {data?.shippingAddress.address1 +
-              " " +
-              data?.shippingAddress.address2}
+            {data?.shippingAddress
+              ? `${data.shippingAddress.address1 || ""} ${data.shippingAddress.address2 || ""}`.trim()
+              : "Address unavailable"}
           </h4>
-          <h4 className="text-[20px]">{data?.shippingAddress.country}</h4>
-          <h4 className="text-[20px]">{data?.shippingAddress.city}</h4>
-          <h4 className="text-[20px]">{data?.user?.phoneNumber}</h4>
+          <h4 className="text-[20px]">
+            {data?.shippingAddress?.country || ""}
+          </h4>
+          <h4 className="text-[20px]">{data?.shippingAddress?.city || ""}</h4>
+          <h4 className="text-[20px]">{data?.user?.phoneNumber || ""}</h4>
         </div>
         <div className="w-full 800px:w-[40%]">
           <h4 className="pt-3 text-[20px]">Payment Info:</h4>
           <h4>
             Status:{" "}
-            {data?.paymentInfo?.status ? data?.paymentInfo?.status : "Not paid"}
+            {data?.paymentInfo?.status === "Paid" ||
+            data?.paymentInfo?.status === "Succeeded"
+              ? "Paid"
+              : "Not paid"}
           </h4>
-          <br/>
-          {
-            data?.status === "Delivered" && (
-              <div className={`${styles.button} text-white`} onClick={refundHandler}>
-                Give a Refund
-              </div>
-            )
-          }
+          <br />
+          {data?.status === "Delivered" && (
+            <div
+              className={`${styles.button} text-white`}
+              onClick={refundHandler}
+            >
+              Give a Refund
+            </div>
+          )}
         </div>
       </div>
       <br />
-      <Link to="/">
+      <Link to="/inbox">
         <div className={`${styles.button} text-white`}>Send Message</div>
       </Link>
-
-
 
       <br />
       <br />

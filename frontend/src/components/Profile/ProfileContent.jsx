@@ -21,6 +21,8 @@ import axios from "axios";
 import { server } from "../../server";
 import { RxCross1 } from "react-icons/rx";
 import { Country, State } from "country-state-city";
+import { loadUser } from "../../redux/actions/user";
+import { getAllOrdersOfUser } from "../../redux/actions/order";
 
 const ProfileContent = ({ active }) => {
   const { user, error, successMessage } = useSelector((state) => state.user);
@@ -235,7 +237,7 @@ const AllOrders = () => {
       minWidth: 130,
       flex: 0.7,
       cellClassName: (params) => {
-        return params.getValue(params.id, "status") === "Delivered"
+        return params.value === "Delivered"
           ? "greenColor"
           : "redColor";
       },
@@ -279,8 +281,8 @@ const AllOrders = () => {
   orders &&
     orders.forEach((item) => {
       row.push({
-        id: item.id,
-        itemsQty: item.cart.length,
+        id: item._id,
+        itemsQty: item.cart?.length || 0,
         total: "US$" + item.totalPrice,
         status: item.status,
       });
@@ -320,7 +322,7 @@ const AllRefundOrders = () => {
       minWidth: 130,
       flex: 0.7,
       cellClassName: (params) => {
-        return params.getValue(params.id, "status") === "Refunded"
+        return params.value === "Refunded"
           ? "greenColor"
           : "redColor";
       },
@@ -363,10 +365,10 @@ const AllRefundOrders = () => {
   eligibleOrders &&
     eligibleOrders.forEach((item) => {
       row.push({
-        id: item.id,
-        itemsQty: item.order_items.length,
+        id: item._id,
+        itemsQty: item.cart?.length || 0,
         total: "US$" + item.totalPrice,
-        status: item.orderStatus,
+        status: item.status,
       });
     });
 
@@ -408,7 +410,7 @@ const TrackOrder = () => {
       minWidth: 130,
       flex: 0.7,
       cellClassName: (params) => {
-        return params.getValue(params.id, "status") === "Delivered"
+        return params.value === "Delivered"
           ? "greenColor"
           : "redColor";
       },
@@ -452,10 +454,10 @@ const TrackOrder = () => {
   orders &&
     orders.forEach((item) => {
       row.push({
-        id: item.id,
-        itemsQty: item.orderItems.length,
+        id: item._id,
+        itemsQty: item.cart?.length || 0,
         total: "US$" + item.totalPrice,
-        status: item.orderStatus,
+        status: item.status,
       });
     });
 

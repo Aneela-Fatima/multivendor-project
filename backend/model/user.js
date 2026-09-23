@@ -22,22 +22,22 @@ const userSchema = new mongoose.Schema({
   },
   addresses: [
     {
-      country:{
+      country: {
         type: String,
       },
-      city:{
+      city: {
         type: String,
       },
-      address1:{
+      address1: {
         type: String,
       },
-      address2:{
+      address2: {
         type: String,
       },
-      zipCode:{
+      zipCode: {
         type: Number,
       },
-      addressType:{
+      addressType: {
         type: String,
       },
     },
@@ -65,13 +65,12 @@ const userSchema = new mongoose.Schema({
 });
 
 //  Hash password
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   if (!this.isModified("password")) {
-    return next();
+    return;
   }
 
   this.password = await bcrypt.hash(this.password, 10);
-  next();
 });
 
 // jwt token

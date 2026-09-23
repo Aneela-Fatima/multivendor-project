@@ -6,7 +6,7 @@ const { upload } = require("../multer");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const ErrorHandler = require("../utils/ErrorHandler");
 const Shop = require("../model/shop");
-const { isSeller } = require("../middleware/auth");
+const { isAuthenticated, isSeller } = require("../middleware/auth");
 
 // create product
 router.post(
@@ -111,7 +111,7 @@ router.get(
 );
 
 // review for a product
-export const productReview = catchAsyncErrors(async (req, res, next) => {
+const productReview = catchAsyncErrors(async (req, res, next) => {
   try {
     const { rating, comment, productId, orderId } = req.body;
     const userId = req.user._id; // user from Middleware
@@ -145,25 +145,25 @@ export const productReview = catchAsyncErrors(async (req, res, next) => {
       avatar: req.user.avatar,
     };
 
-    // Add/Update review
+    // A user can review a product only once, even across multiple orders.
     const existingReview = product.reviews.find(
       (rev) => rev.user._id.toString() === userId.toString(),
     );
 
     if (existingReview) {
-      existingReview.rating = Number(rating);
-      existingReview.comment = comment;
-      existingReview.user = reviewObj;
-    } else {
-      product.reviews.push({
-        user: reviewObj,
-        rating: Number(rating),
-        comment,
-        productId,
-      });
+      return next(
+        new ErrorHandler("You have already reviewed this product!", 400),
+      );
     }
+
+    product.reviews.push({
+      user: reviewObj,
+      rating: Number(rating),
+      comment,
+      productId,
+    });
      // Recalculate average rating
-    product.ratings =
+    product.rating =
       product.reviews.reduce((sum, rev) => sum + rev.rating, 0) /
       product.reviews.length;
 
@@ -184,9 +184,11 @@ export const productReview = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
+router.put("/create-new-review", isAuthenticated, productReview);
+
 
 // GET ALL PRODUCTS (ADMIN ONLY)
-export const getAllAdminProducts = catchAsyncErrors(async (req, res, next) => {
+const getAllAdminProducts = catchAsyncErrors(async (req, res, next) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
 

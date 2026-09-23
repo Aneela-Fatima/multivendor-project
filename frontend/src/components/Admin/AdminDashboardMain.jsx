@@ -6,11 +6,10 @@ import { Link } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllOrdersOfAdmin } from "../../redux/actions/order.js";
-import { getAllSellers } from "../../redux/actions/seller.js";
-import Loader from "../Common/Loader";
+import { getAllSellers } from "../../redux/actions/sellers.js";
+import Loader from "../Layout/Loader";
 
 const AdminDashboardMain = () => {
-
   const dispatch = useDispatch();
   const { adminOrders, adminOrderLoading } = useSelector(
     (state) => state.orders,

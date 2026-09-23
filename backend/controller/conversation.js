@@ -1,6 +1,7 @@
 const Conversation = require("../model/conversation");
 const ErrorHandler = require("../utils/ErrorHandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+const { isAuthenticated, isSeller, isAuthenticatedOrSeller } = require("../middleware/auth");
 const express = require("express");
 const router = express.Router();
 
@@ -20,7 +21,7 @@ router.post(
             conversation,
         })
       }else{
-        const conversation = await Coversation.create({
+        const conversation = await Conversation.create({
         members: [userId,sellerId],
         groupTitle: groupTitle
       });
@@ -37,7 +38,7 @@ router.post(
 }));
 
 // get seller conversation
-export const getSellerConversations = catchAsyncErrors(async (req, res, next) => {
+const getSellerConversations = catchAsyncErrors(async (req, res, next) => {
   try {
     // Sellers can only ever fetch their own conversation list
     if (req.params.id !== req.seller._id.toString()) {
@@ -58,7 +59,7 @@ export const getSellerConversations = catchAsyncErrors(async (req, res, next) =>
 });
 
 // get userconversation
-export const getUserConversations = catchAsyncErrors(async (req, res, next) => {
+const getUserConversations = catchAsyncErrors(async (req, res, next) => {
   try {
     if (req.params.id !== req.user._id.toString()) {
       return next(new ErrorHandler("Unauthorized", 403));
@@ -78,7 +79,7 @@ export const getUserConversations = catchAsyncErrors(async (req, res, next) => {
 });
 
 // update last message
-export const updateLastMessage = catchAsyncErrors(async (req, res, next) => {
+const updateLastMessage = catchAsyncErrors(async (req, res, next) => {
   try {
     const { lastMessage, lastMessageId } = req.body;
 
@@ -104,6 +105,22 @@ export const updateLastMessage = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler(error.message, 500));
   }
 });
+
+router.get(
+  "/get-all-conversation-seller/:id",
+  isSeller,
+  getSellerConversations,
+);
+router.get(
+  "/get-all-conversation-user/:id",
+  isAuthenticated,
+  getUserConversations,
+);
+router.put(
+  "/update-last-message/:id",
+  isAuthenticatedOrSeller,
+  updateLastMessage,
+);
 
 
 module.exports = router;

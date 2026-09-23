@@ -1,11 +1,13 @@
-import Messages from "../model/message.js";
-import Conversation from "../model/conversation.model.js";
-import uploadToCloudinary from "../utils/uploadToCloudinary.js"; // ⬅️ Add this import at top
-import ErrorHandler from "../utils/ErrorHandler.js";
-import catchAsyncErrors from "../middleware/catchAsyncErrors.js";
+const express = require("express");
+const Messages = require("../model/messages");
+const Conversation = require("../model/conversation");
+const ErrorHandler = require("../utils/ErrorHandler");
+const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+const { isAuthenticatedOrSeller } = require("../middleware/auth");
+const router = express.Router();
 
 //  CREATE NEW MESSAGE (with optional image upload)
-export const createMessage = catchAsyncErrors(async (req, res, next) => {
+const createMessage = catchAsyncErrors(async (req, res, next) => {
   try {
     const { conversationId, text, sender } = req.body;
 
@@ -18,23 +20,10 @@ export const createMessage = catchAsyncErrors(async (req, res, next) => {
       return next(new ErrorHandler("Unauthorized", 403));
     }
 
-    let images = [];
-    if (req.files && req.files.length > 0) {
-      const uploadPromises = req.files.map((file) =>
-        uploadToCloudinary(file.buffer, "sahiwal-electronics/chat"),
-      );
-      const results = await Promise.all(uploadPromises);
-      images = results.map((result) => ({
-        public_id: result.public_id,
-        url: result.secure_url,
-      }));
-    }
-
     const message = new Messages({
       conversationId,
       text,
       sender,
-      images: images.length > 0 ? images : undefined,
     });
 
     await message.save();
@@ -50,7 +39,7 @@ export const createMessage = catchAsyncErrors(async (req, res, next) => {
 
 
 //  GET ALL MESSAGES FOR A CONVERSATION
-export const getMessages = catchAsyncErrors(async (req, res, next) => {
+const getMessages = catchAsyncErrors(async (req, res, next) => {
   try {
     const conversation = await Conversation.findById(req.params.id);
     if (!conversation || !conversation.members.includes(req.authId)) {
@@ -69,3 +58,16 @@ export const getMessages = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler(error.message, 500));
   }
 });
+
+router.post(
+  "/create-new-message",
+  isAuthenticatedOrSeller,
+  createMessage,
+);
+router.get(
+  "/get-all-messages/:id",
+  isAuthenticatedOrSeller,
+  getMessages,
+);
+
+module.exports = router;

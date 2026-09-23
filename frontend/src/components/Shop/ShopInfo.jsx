@@ -13,6 +13,9 @@ const ShopInfo = ({ isOwner }) => {
   const [isLoading,setIsLoading] = useState(false);
   const {id} = useParams();
   const dispatch = useDispatch();
+  const totalReviewsLength = products?.reduce((acc, product) => acc + (product.reviews?.length || 0), 0) || 0;
+  const totalRatings = products?.reduce((acc, product) => acc + (product.reviews || []).reduce((sum, review) => sum + review.rating, 0), 0) || 0;
+  const averageRating = totalRatings / totalReviewsLength || 0;
   useEffect(() => {
     dispatch(getAllProductsShop(id));
     setIsLoading(true);
@@ -30,13 +33,6 @@ const ShopInfo = ({ isOwner }) => {
       { withCredentials: true });
     window.location.reload();
 
-    const totalReviewsLength =
-    products &&
-    products.reduce((acc, product) => acc + product.reviews.length, 0);
-
-  const totalRatings = products && products.reduce((acc,product) => acc + product.reviews.reduce((sum,review) => sum + review.rating, 0),0);
-
-  const averageRating = totalRatings / totalReviewsLength || 0;
   };
   return (
     <>

@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "../../styles/styles";
 import { backend_url } from "../../server";
 import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { server } from "../../server";
 import { getAllProductsShop } from "../../redux/actions/product";
 import {
   AiFillHeart,
@@ -18,10 +20,19 @@ import { toast } from "react-toastify";
 import { addToCart } from "../../redux/actions/cart";
 import Ratings from "./Ratings";
 
+const getAvatarUrl = (avatar) => {
+  const avatarUrl = typeof avatar === "string" ? avatar : avatar?.url;
+  if (!avatarUrl) return "https://via.placeholder.com/50";
+  return avatarUrl.startsWith("http")
+    ? avatarUrl
+    : `${backend_url}${avatarUrl.replace(/^\//, "")}`;
+};
+
 const ProductDetails = ({ data }) => {
   const { wishlist } = useSelector((state) => state.wishlist);
   const { cart } = useSelector((state) => state.cart);
   const { products } = useSelector((state) => state.products);
+  const { user } = useSelector((state) => state.user);
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
   const [select, setSelect] = useState(0);
@@ -29,7 +40,7 @@ const ProductDetails = ({ data }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getAllProductsShop(data && data?.shop_id));
+    dispatch(getAllProductsShop(data && data?.shopId));
     if (wishlist && wishlist.find((i) => i._id === data?._id)) {
       setClick(true);
     } else {
@@ -68,15 +79,13 @@ const ProductDetails = ({ data }) => {
     products &&
     products.reduce((acc, product) => acc + product.reviews.length, 0);
 
-  const totalRatings =
-    products &&
-    products.reduce(
-      (acc, product) =>
-        acc + product.reviews.reduce((sum, reviews) => sum + reviews.rating, 0),
-      0,
-    );
-
-  const averageRatings = totalRatings / totalReviewsLength || 0;
+  const productReviewCount = data?.reviews?.length || 0;
+  const productRatingTotal =
+    data?.reviews?.reduce((sum, review) => sum + Number(review.rating || 0), 0) ||
+    0;
+  const averageRatings = productReviewCount
+    ? productRatingTotal / productReviewCount
+    : 0;
   const decrementCount = () => {
     if (count > 1) {
       setCount(count - 1);
@@ -88,7 +97,7 @@ const ProductDetails = ({ data }) => {
   };
 
   const handleMessageSubmit = async () => {
-    if (isAuthenticated) {
+    if (user) {
       const groupTitle = data._id + user._id;
       const userId = user._id;
       const sellerId = data.shop._id;
@@ -97,12 +106,14 @@ const ProductDetails = ({ data }) => {
           groupTitle,
           userId,
           sellerId,
-        })
+        }, { withCredentials: true })
         .then((res) => {
-          navigate(`/conversation/${res.data.conversation._id}`);
+          navigate("/inbox");
         })
         .catch((error) => {
-          toast.error(error.response.data.message);
+          toast.error(
+            error.response?.data?.message || "Failed to contact the shop",
+          );
         });
     } else {
       toast.error("Please login to create a conversation");
@@ -125,8 +136,9 @@ const ProductDetails = ({ data }) => {
                   <div className="w-full flex gap-3 mt-4 justify-center">
                     {data &&
                       data.images.map((i, index) => {
-                        <div
+                        return <div
                           className={`${select === 0 ? "border-2 border-blue-500" : "border border-gray-200"} cursor-pointer p-1 rounded-md`}
+                          key={i}
                         >
                           <img
                             alt=""
@@ -216,7 +228,7 @@ const ProductDetails = ({ data }) => {
                 <div className="flex items-center pt-8">
                   <Link to={`/shop/preview/${data?.shop._id}`}>
                     <img
-                      src={`${backend_url}${data?.shop?.avatar}`}
+                      src={getAvatarUrl(data?.shop?.avatar)}
                       alt="Shop Avatar"
                       className="h-[50px] w-[50px] rounded-full mr-2"
                     />
@@ -317,16 +329,19 @@ const ProductDetailsInfo = ({
         <div className="w-full min-h-[40vh] flex flex-col items-center py-3 overflow-y-scroll">
           {data &&
             data.reviews.map((item, index) => (
-              <div className="w-full my-2 flex">
+              <div
+                key={item._id || `${item.productId}-${item.user?._id}-${index}`}
+                className="w-full my-2 flex"
+              >
                 <img
                   alt=""
-                  src={`${backend_url}/${item.user.avatar}`}
+                  src={getAvatarUrl(item.user?.avatar)}
                   className="w-[50px] h-[50px] rounded-full"
                 />
                 <div className="pl-2 ">
                   <div className="w-full flex items-center">
                     <h1 className="font-[500] mr-3">{item.user.name}</h1>
-                    <Ratings rating={data.ratings} />
+                    <Ratings rating={Number(item.rating || 0)} />
                   </div>
                   <p>{item.comment}</p>
                 </div>
@@ -346,7 +361,7 @@ const ProductDetailsInfo = ({
             <Link to={`/shop/preview/${data.shop._id}`}>
               <div className="flex items-center">
                 <img
-                  src={`${backend_url}${data?.shop?.avatar}`}
+                  src={getAvatarUrl(data?.shop?.avatar)}
                   alt=""
                   className="w-[50px] h-[50px] rounded-full"
                 />

@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import styles from "../../styles/styles";
 import { BsFillBagFill } from "react-icons/bs";
-import { Link } from "react-router-dom";
-import { useDispatch, useSelector, useNavigate } from "react-redux";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { getAllOrdersOfShop } from "../../redux/actions/order";
-import { backend_url } from "../../server";
+import { backend_url, server } from "../../server";
 import { toast } from "react-toastify";
 
 const OrderDetails = () => {
@@ -15,6 +16,16 @@ const OrderDetails = () => {
   const [status, setStatus] = useState("");
 
   const { id } = useParams();
+  const deliveryStatuses = [
+    "Processing",
+    "Transferred to delivery partner",
+    "Shipping",
+    "Received",
+    "On the way",
+    "Delivered",
+  ];
+  const refundStatuses = ["Processing refund", "Refund Success"];
+
   const orderUpdateHandler = async (e) => {
     await axios
       .put(
@@ -29,11 +40,11 @@ const OrderDetails = () => {
         navigate("/dashboard-orders");
       })
       .catch((error) => {
-        toast.error(error.response.data.message);
+        toast.error(error.response?.data?.message || "Failed to update order");
       });
   };
 
-  const refundOrderUpdateHandler = async(e) => {
+  const refundOrderUpdateHandler = async (e) => {
     await axios
       .put(
         `${server}/order/order-refund-success/${id}`,
@@ -44,17 +55,26 @@ const OrderDetails = () => {
       )
       .then((res) => {
         toast.success("Order updated!");
-        dispatch(getAllOrdersOfShop(seller._id))
+        dispatch(getAllOrdersOfShop(seller._id));
       })
       .catch((error) => {
-        toast.error(error.response.data.message);
+        toast.error(error.response?.data?.message || "Failed to update refund");
       });
-  }
+  };
   useEffect(() => {
-    dispatch(getAllOrdersOfShop(seller._id));
-  }, [dispatch]);
+    if (seller?._id) {
+      dispatch(getAllOrdersOfShop(seller._id));
+    }
+  }, [dispatch, seller?._id]);
 
   const data = orders && orders.find((item) => item._id === id);
+  const isRefundOrder =
+    data?.status === "Processing refund" ||
+    data?.status === "Refund success" ||
+    data?.status === "Refund Success";
+  const isRefundComplete =
+    data?.status === "Refund success" || data?.status === "Refund Success";
+  const availableStatuses = isRefundOrder ? refundStatuses : deliveryStatuses;
   return (
     <div className={`py-4 min-h-screen ${styles.section}`}>
       <div className="w-full flex items-center justify-between">
@@ -97,11 +117,6 @@ const OrderDetails = () => {
                 US${item.discountPrice} X {item.qty}
               </h5>
             </div>
-            {data?.status === "Delivered" && (
-              <div className={`${styles.button} text-[#fff] `}>
-                Write a Review
-              </div>
-            )}
           </div>
         ))}
 
@@ -136,58 +151,32 @@ const OrderDetails = () => {
       <br />
       <h4 className="pt-3 text-[20px] font-[600]">Order Status:</h4>
 
-      {data?.status !== "Processing refund" || data?.status !== "Refund success" && (
+      {!isRefundComplete && (
         <select
-          value={status}
+          value={status || data?.status || ""}
           onChange={(e) => setStatus(e.target.value)}
           className="w-[200px] mt-2 border h-[35px] rounded-[5px]"
         >
-          {[
-            "Processing",
-            "Transferred to delivery partner",
-            "Shipping",
-            "Received",
-            "On the way",
-            "Delivered",
-          ]
-            .slice(
-              [
-                "Processing",
-                "Transferred to delivery partner",
-                "Shipping",
-                "Received",
-                "On the way",
-                "Delivered",
-              ].indexOf(data?.status),
-            )
-            .map((option, index) => (
-              <option value={option} key={index}>
+          {availableStatuses
+            .slice(Math.max(0, availableStatuses.indexOf(data?.status)))
+            .map((option) => (
+              <option value={option} key={option}>
                 {option}
               </option>
             ))}
         </select>
       )}
 
-      <select
-        value={status}
-        onChange={(e) => setStatus(e.target.value)}
-        className="w-[200px] mt-2 border h-[35px] rounded-[5px]"
-      >
-        {["Processing refund", "Refund success"]
-          .slice(["Processing refund", "Refund success"].indexOf(data?.status))
-          .map((option, index) => (
-            <option value={option} key={index}>
-              {option}
-            </option>
-          ))}
-      </select>
-
-      <div
-        className={`${styles.button} mt-5 !bg-[#FCE1E6] !rounded-[4px] !text-[#E94560] font-[600] !h-[45px] text-[18px]`}
-        onClick={order?.status !== "Processing refund" ? orderUpdateHandler : refundOrderUpdateHandler}
-      >
-        Update Status
-      </div>
+      {!isRefundComplete && (
+        <div
+          className={`${styles.button} mt-5 !bg-[#FCE1E6] !rounded-[4px] !text-[#E94560] font-[600] !h-[45px] text-[18px]`}
+          onClick={
+            isRefundOrder ? refundOrderUpdateHandler : orderUpdateHandler
+          }
+        >
+          Update Status
+        </div>
+      )}
     </div>
   );
 };

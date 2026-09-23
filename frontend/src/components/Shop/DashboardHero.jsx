@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { AiOutlineArrowRight, AiOutlineMoneyCollect } from "react-icons/ai";
-import styles from "../../styles/styles.js";
 import { Link } from "react-router-dom";
 import { MdBorderClear } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,13 +7,17 @@ import { getAllOrdersOfShop } from "../../redux/actions/order.js";
 import { getAllProductsShop } from "../../redux/actions/product.js";
 import { DataGrid } from "@mui/x-data-grid";
 import { Button } from "@mui/material";
-import Loader from "../Common/Loader.jsx";
+import Loader from "../Layout/Loader.jsx";
 
 const SellerDashboardHero = () => {
   const dispatch = useDispatch();
   const { seller } = useSelector((state) => state.seller);
-  const { orders, loading: ordersLoading } = useSelector((state) => state.orders);
-  const { products, loading: productsLoading } = useSelector((state) => state.products);
+  const { orders = [], loading: ordersLoading = false } = useSelector(
+    (state) => state.order || {},
+  );
+  const { products, loading: productsLoading } = useSelector(
+    (state) => state.products,
+  );
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -51,12 +54,25 @@ const SellerDashboardHero = () => {
       cellClassName: (params) => {
         const status = params.row.status;
         if (status === "Delivered") return "greenColor";
-        if (status === "Processing refund" || status === "Refund Success") return "orangeColor";
+        if (status === "Processing refund" || status === "Refund Success")
+          return "orangeColor";
         return "redColor";
       },
     },
-    { field: "itemsQty", headerName: "Total Items", type: "number", minWidth: 130, flex: 0.7 },
-    { field: "total", headerName: "Total", type: "number", minWidth: 130, flex: 0.8 },
+    {
+      field: "itemsQty",
+      headerName: "Total Items",
+      type: "number",
+      minWidth: 130,
+      flex: 0.7,
+    },
+    {
+      field: "total",
+      headerName: "Total",
+      type: "number",
+      minWidth: 130,
+      flex: 0.8,
+    },
     {
       field: "action",
       flex: 1,
@@ -89,7 +105,9 @@ const SellerDashboardHero = () => {
           {label} {sublabel && <span className="text-[13px]">{sublabel}</span>}
         </h3>
       </div>
-      <h5 className="pt-2 pl-[32px] price-tag text-[20px] text-ink inline-block mt-1">{value}</h5>
+      <h5 className="pt-2 pl-[32px] price-tag text-[20px] text-ink inline-block mt-1">
+        {value}
+      </h5>
       <Link to={linkTo}>
         <h5 className="pt-4 pl-2 text-voltage hover:underline cursor-pointer font-body text-sm">
           {linkLabel}
@@ -100,7 +118,9 @@ const SellerDashboardHero = () => {
 
   return (
     <div className="w-full p-8">
-      <h3 className="text-[22px] font-display font-[600] text-ink pb-4">Overview</h3>
+      <h3 className="text-[22px] font-display font-[600] text-ink pb-4">
+        Overview
+      </h3>
 
       <div className="w-full block 800px:flex items-center justify-between gap-4">
         {statCard(
@@ -116,7 +136,7 @@ const SellerDashboardHero = () => {
           "All Orders",
           null,
           orders?.length || 0,
-          "/dashboard-all-orders",
+          "/dashboard-orders",
           "View Orders",
         )}
         {statCard(
@@ -124,14 +144,16 @@ const SellerDashboardHero = () => {
           "All Products",
           null,
           products?.length || 0,
-          "/dashboard-all-products",
+          "/dashboard-products",
           "View Products",
         )}
       </div>
 
       <br />
 
-      <h3 className="text-[22px] font-display font-[600] text-ink pb-2">Latest Orders</h3>
+      <h3 className="text-[22px] font-display font-[600] text-ink pb-2">
+        Latest Orders
+      </h3>
       <div className="w-full min-h-[45vh] bg-white border border-divider rounded-lg">
         <DataGrid
           rows={rows}

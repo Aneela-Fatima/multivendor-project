@@ -1,11 +1,12 @@
-import Withdraw from "../model/withdraw.model.js";
-import Shop from "../model/shop.model.js";
-import ErrorHandler from "../utils/ErrorHandler.js";
-import catchAsyncErrors from "../middleware/catchAsyncErrors.js";
-import sendMail from "../utils/sendMail.js";
+const express = require("express");
+const Withdraw = require("../model/withdraw");
+const Shop = require("../model/shop");
+const ErrorHandler = require("../utils/ErrorHandler");
+const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+const router = express.Router();
 
 // CREATE WITHDRAW REQUEST (SELLER ONLY)
-export const createWithdrawRequest = catchAsyncErrors(
+const createWithdrawRequest = catchAsyncErrors(
   async (req, res, next) => {
     try {
       const { amount } = req.body;
@@ -56,7 +57,7 @@ export const createWithdrawRequest = catchAsyncErrors(
 
 
 // GET ALL WITHDRAW REQUESTS (ADMIN ONLY)=
-export const getAllWithdraws = catchAsyncErrors(async (req, res, next) => {
+const getAllWithdraws = catchAsyncErrors(async (req, res, next) => {
   try {
     const withdraws = await Withdraw.find().sort({ createdAt: -1 });
 
@@ -71,7 +72,7 @@ export const getAllWithdraws = catchAsyncErrors(async (req, res, next) => {
 
 
 // UPDATE WITHDRAW STATUS (ADMIN ONLY)
-export const updateWithdrawStatus = catchAsyncErrors(async (req, res, next) => {
+const updateWithdrawStatus = catchAsyncErrors(async (req, res, next) => {
   try {
     const { id } = req.params;
     const { sellerId } = req.body;
@@ -130,3 +131,9 @@ export const updateWithdrawStatus = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler(error.message, 500));
   }
 });
+
+router.post("/create-withdraw-request", createWithdrawRequest);
+router.get("/admin-all-withdraws", getAllWithdraws);
+router.put("/admin-update-withdraw-request/:id", updateWithdrawStatus);
+
+module.exports = router;

@@ -9,6 +9,7 @@ const sendShopToken = require("../utils/ShopToken");
 const { isAuthenticated } = require("../middleware/auth");
 const { isSeller } = require("../middleware/auth");
 const Shop = require("../model/shop");
+const Product = require("../model/product");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const ErrorHandler = require("../utils/ErrorHandler");
 
@@ -193,7 +194,7 @@ router.get(
 
 
 // get shop info
-router.get("./get-sop-info/:id",catchAsyncErrors(async(req,res,next)=>{
+router.get("/get-shop-info/:id",catchAsyncErrors(async(req,res,next)=>{
   try {
     const shop = await Shop.findById(req.params.id);
     res.status(201).json({
@@ -208,29 +209,33 @@ router.get("./get-sop-info/:id",catchAsyncErrors(async(req,res,next)=>{
 
 
 // update shop avatar
-export const updateShopAvatar = catchAsyncErrors(async (req, res, next) => {
+const updateShopAvatar = catchAsyncErrors(async (req, res, next) => {
   try {
+    if (!req.file) {
+      return next(new ErrorHandler("Please select an image", 400));
+    }
+
     const seller = await Shop.findById(req.seller.id);
 
     if (!seller) {
       return next(new ErrorHandler("Shop not found", 404));
     }
 
-    // Delete old avatar from Cloudinary
     if (seller.avatar?.public_id) {
-      await cloudinary.uploader.destroy(seller.avatar.public_id);
+      const oldAvatarPath = path.join(
+        "uploads",
+        path.basename(seller.avatar.public_id),
+      );
+      if (fs.existsSync(oldAvatarPath)) {
+        fs.unlinkSync(oldAvatarPath);
+      }
     }
 
-    const result = await uploadToCloudinary(
-      req.file.buffer,
-      "sahiwal-electronics/shops",
-    );
-
     seller.avatar = {
-      public_id: result.public_id,
-      url: result.secure_url,
+      public_id: req.file.filename,
+      url: `${req.protocol}://${req.get("host")}/${req.file.filename}`,
     };
-       await seller.save();
+    await seller.save();
 
     // Update all products of this shop with new shop info
     await Product.updateMany(
@@ -248,7 +253,7 @@ export const updateShopAvatar = catchAsyncErrors(async (req, res, next) => {
 });
 
 // update seller info
-export const updateShopInfo = catchAsyncErrors(async (req, res, next) => {
+const updateShopInfo = catchAsyncErrors(async (req, res, next) => {
   try {
     const { name, description, address, phoneNumber, zipCode } = req.body;
 
@@ -278,9 +283,17 @@ export const updateShopInfo = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
+router.put(
+  "/update-shop-avatar",
+  isSeller,
+  upload.single("file"),
+  updateShopAvatar,
+);
+router.put("/update-seller-info", isSeller, updateShopInfo);
+
 
 // get all sellers ---- admin only
-export const getAllSellers = catchAsyncErrors(async (req, res, next) => {
+const getAllSellers = catchAsyncErrors(async (req, res, next) => {
   try {
     const sellers = await Shop.find().sort({ createdAt: -1 });
     res.status(200).json({
@@ -293,7 +306,7 @@ export const getAllSellers = catchAsyncErrors(async (req, res, next) => {
 });
 
 // DELETE SELLER (ADMIN ONLY)
-export const deleteSeller = catchAsyncErrors(async (req, res, next) => {
+const deleteSeller = catchAsyncErrors(async (req, res, next) => {
   try {
     const seller = await Shop.findById(req.params.id);
     if (!seller) {
@@ -317,7 +330,7 @@ export const deleteSeller = catchAsyncErrors(async (req, res, next) => {
 });
 
 // UPDATE PAYMENT METHODS (SELLER ONLY)
-export const updatePaymentMethods = catchAsyncErrors(async (req, res, next) => {
+const updatePaymentMethods = catchAsyncErrors(async (req, res, next) => {
   try {
     const { withdrawMethod } = req.body;
 
@@ -340,7 +353,7 @@ export const updatePaymentMethods = catchAsyncErrors(async (req, res, next) => {
 });
 
 // DELETE WITHDRAW METHOD (SELLER ONLY)
-export const deleteWithdrawMethod = catchAsyncErrors(async (req, res, next) => {
+const deleteWithdrawMethod = catchAsyncErrors(async (req, res, next) => {
   try {
     const seller = await Shop.findById(req.seller._id);
 
@@ -359,5 +372,8 @@ export const deleteWithdrawMethod = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler(error.message, 500));
   }
 });
+
+router.put("/update-payment-methods", isSeller, updatePaymentMethods);
+router.delete("/delete-withdraw-method", isSeller, deleteWithdrawMethod);
 
 module.exports = router;

@@ -15,6 +15,7 @@ const Checkout = () => {
   const [userInfo, setUserInfo] = useState(false);
   const [address1, setAddress1] = useState("");
   const [address2, setAddress2] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [selectedAddressId, setSelectedAddressId] = useState("");
   const [couponCode, setCouponCode] = useState("");
@@ -27,10 +28,15 @@ const Checkout = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    setPhoneNumber(user?.phoneNumber ? String(user.phoneNumber) : "");
+  }, [user?.phoneNumber]);
+
   const paymentSubmit = () => {
     if (
       address1 === "" ||
       address2 === "" ||
+      phoneNumber === "" ||
       zipCode === null ||
       country === "" ||
       city === ""
@@ -40,6 +46,7 @@ const Checkout = () => {
       const shippingAddress = {
         address1,
         address2,
+        phoneNumber,
         zipCode,
         country,
         city,
@@ -130,7 +137,10 @@ const Checkout = () => {
             setUserInfo={setUserInfo}
             address1={address1}
             setAddress1={setAddress1}
-            address2={setAddress2}
+            address2={address2}
+            setAddress2={setAddress2}
+            phoneNumber={phoneNumber}
+            setPhoneNumber={setPhoneNumber}
             zipCode={zipCode}
             setZipCode={setZipCode}
             selectedAddressId={selectedAddressId}
@@ -170,6 +180,8 @@ const ShippingInfo = ({
   setAddress1,
   address2,
   setAddress2,
+  phoneNumber,
+  setPhoneNumber,
   zipCode,
   setZipCode,
   selectedAddressId,
@@ -224,11 +236,11 @@ const ShippingInfo = ({
               Phone Number
             </label>
             <input
-              type="number"
+              type="tel"
               required
-              value={user ? user.phoneNumber || "" : ""}
-              className={`${styles.input} !w-[95%] !bg-[#f9fafb]`}
-              readOnly
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className={`${styles.input} !w-[95%] !bg-[#fff]`}
             />
           </div>
           <div className="w-[50%]">

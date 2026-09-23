@@ -7,7 +7,7 @@ import { RxCross1 } from "react-icons/rx";
 import { toast } from "react-toastify";
 import styles from "../../styles/styles.js";
 import { axiosServerInstance } from "../../server.js";
-import Loader from "../Common/Loader.jsx";
+import Loader from "../Layout/Loader.jsx";
 
 const AdminAllWithdraws = () => {
   const [withdraws, setWithdraws] = useState([]);
@@ -106,7 +106,9 @@ const AdminAllWithdraws = () => {
       sortable: false,
       renderCell: (params) => {
         if (params.row.status === "succeed") {
-          return <span className="text-ink/40 font-body text-sm">Completed</span>;
+          return (
+            <span className="text-ink/40 font-body text-sm">Completed</span>
+          );
         }
         return (
           <Button
@@ -115,7 +117,10 @@ const AdminAllWithdraws = () => {
               setOpenModal(true);
             }}
           >
-            <BsPencil size={18} className="text-voltage hover:text-voltage/70 transition-colors" />
+            <BsPencil
+              size={18}
+              className="text-voltage hover:text-voltage/70 transition-colors"
+            />
           </Button>
         );
       },
@@ -189,7 +194,8 @@ const AdminAllWithdraws = () => {
               Update Withdraw Status
             </h1>
             <p className="text-center font-body text-ink/50 text-sm mb-4">
-              Confirm to mark this withdraw request as <strong className="text-stock">Succeed</strong>
+              Confirm to mark this withdraw request as{" "}
+              <strong className="text-stock">Succeed</strong>
             </p>
 
             <div className="flex flex-col items-center gap-4 mt-4">
@@ -200,11 +206,17 @@ const AdminAllWithdraws = () => {
                 </p>
                 <p className="text-sm font-body text-ink/70">
                   <span className="font-semibold text-ink">Amount:</span>{" "}
-                  <span className="price-tag text-stock">${selectedWithdraw?.amount}</span>
+                  <span className="price-tag text-stock">
+                    ${selectedWithdraw?.amount}
+                  </span>
                 </p>
                 <p className="text-sm font-body text-ink/70">
-                  <span className="font-semibold text-ink">Current Status:</span>{" "}
-                  <span className="text-copper font-medium">{selectedWithdraw?.status}</span>
+                  <span className="font-semibold text-ink">
+                    Current Status:
+                  </span>{" "}
+                  <span className="text-copper font-medium">
+                    {selectedWithdraw?.status}
+                  </span>
                 </p>
               </div>
 

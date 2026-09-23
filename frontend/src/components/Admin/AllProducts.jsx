@@ -4,17 +4,17 @@ import { Link } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
 import { Button } from "@mui/material";
 import { AiOutlineEye } from "react-icons/ai";
-import { getAllAdminProducts } from "../../redux/actions/product.js";
-import Loader from "../Common/Loader.jsx";
+import { getAllProducts } from "../../redux/actions/product.js";
+import Loader from "../Layout/Loader.jsx";
 
 const AdminAllProducts = () => {
   const dispatch = useDispatch();
-  const { adminProducts, adminProductsLoading, error } = useSelector(
-    (state) => state.products
+  const { allProducts, isLoading, error } = useSelector(
+    (state) => state.products,
   );
 
   useEffect(() => {
-    dispatch(getAllAdminProducts());
+    dispatch(getAllProducts());
   }, [dispatch]);
 
   const columns = [
@@ -31,7 +31,11 @@ const AdminAllProducts = () => {
       minWidth: 120,
       flex: 0.6,
       renderCell: (params) => {
-        return <span className="price-tag text-voltage text-[15px]">${params.row.price}</span>;
+        return (
+          <span className="price-tag text-voltage text-[15px]">
+            ${params.row.price}
+          </span>
+        );
       },
     },
     {
@@ -68,7 +72,10 @@ const AdminAllProducts = () => {
         return (
           <Link to={`/product/${params.row.id}`}>
             <Button>
-              <AiOutlineEye size={20} className="text-voltage hover:text-voltage/70 transition-colors" />
+              <AiOutlineEye
+                size={20}
+                className="text-voltage hover:text-voltage/70 transition-colors"
+              />
             </Button>
           </Link>
         );
@@ -77,7 +84,7 @@ const AdminAllProducts = () => {
   ];
 
   const rows =
-    adminProducts?.map((item) => ({
+    allProducts?.map((item) => ({
       id: item._id,
       name: item.name || "N/A",
       price: item.discountPrice || item.originalPrice || 0,
@@ -86,7 +93,7 @@ const AdminAllProducts = () => {
       category: item.category || "Uncategorized",
     })) || [];
 
-  if (adminProductsLoading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
         <Loader />
@@ -97,7 +104,9 @@ const AdminAllProducts = () => {
   if (error) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
-        <p className="text-copper font-body text-lg">Failed to load products: {error}</p>
+        <p className="text-copper font-body text-lg">
+          Failed to load products: {error}
+        </p>
       </div>
     );
   }

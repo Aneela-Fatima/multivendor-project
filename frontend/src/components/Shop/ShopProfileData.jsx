@@ -5,6 +5,8 @@ import { Link, useParams } from "react-router-dom";
 import styles from "../../styles/styles";
 import { getAllProductsShop } from "../../redux/actions/product";
 import { getAllEventsShop } from "../../redux/actions/event";
+import {backend_url} from "../../server"
+import Ratings from "../Products/Ratings";
 
 const ShopProfileData = ({ isOwner }) => {
   const { products } = useSelector((state) => state.products);

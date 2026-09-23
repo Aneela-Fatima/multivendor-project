@@ -13,6 +13,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { server } from "../../server";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { MdOutlineAdminPanelSettings } from "react-icons/md";
 
 const ProfileSidebar = ({ active, setActive }) => {
   const navigate = useNavigate();

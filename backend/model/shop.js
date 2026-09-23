@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
+const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const shopSchema = new mongoose.Schema({
   name: {
@@ -100,4 +100,4 @@ shopSchema.methods.comparePassword = async function (enteredPassword) {
 };
 
 
-export default mongoose.model("Shop", shopSchema);
+module.exports = mongoose.model("Shop", shopSchema);

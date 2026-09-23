@@ -4,7 +4,7 @@ import CountDown from "./CountDown";
 import { backend_url } from "../../server";
 import { useSelector, useDispatch } from "react-redux";
 import {Link} from "react-router-dom";
-import {addTocart} from "../../redux/actions/cart";
+import { addToCart } from "../../redux/actions/cart";
 import {toast} from "react-toastify";  
 
 const EventCard = ({ active, data }) => {
@@ -21,7 +21,7 @@ const EventCard = ({ active, data }) => {
         toast.error("Product stock limited!");
       } else {
         const cartData = { ...data, qty: 1 };
-        dispatch(addTocart(cartData));
+        dispatch(addToCart(cartData));
         toast.success("Item added to cart successfully!");
       }
     }

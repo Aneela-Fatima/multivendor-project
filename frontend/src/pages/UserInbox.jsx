@@ -1,39 +1,67 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
+import axios from "axios"
 import Header from '../components/Layout/Header'
 import { useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 import socketIO from "socket.io-client";
-import { format } from "timeago.js";
+import {server,backend_url} from "../server"
 const ENDPOINT = "http://localhost:4000/";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
+const DEFAULT_AVATAR =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect width='50' height='50' fill='%23dbe2ea'/%3E%3Ccircle cx='25' cy='19' r='9' fill='%236b7280'/%3E%3Cpath d='M9 47c2-10 30-10 32 0' fill='%236b7280'/%3E%3C/svg%3E";
 
 const UserInbox = () => {
   const { user } = useSelector((state) => state.user);
+  const { conversationId } = useParams();
   const [conversations, setConversations] = useState([]);
-  const [arrivalMessage, setArrivalMessage] = useState(null);
-  const [currentChat, setCurrentChat] = useState();
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
   const [userData, setUserData] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const [activeStatus, setActiveStatus] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [image, setImage] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+
+  const selectedConversation = conversations.find(
+    (conversation) => conversation._id === conversationId,
+  );
 
   useEffect(() => {
-    socketId.on("getMessage", (data) => {
-      setArrivalMessage({
-        sender: data.senderId,
-        text: data.text,
-        createdAt: Date.now(),
-      });
-    });
-  }, []);
+    if (!conversationId) {
+      setMessages([]);
+      return;
+    }
 
-  useEffect(() => {
-    arrivalMessage &&
-      currentChat?.members.includes(arrivalMessage.sender) &&
-      setMessages((prev) => [...prev, arrivalMessage]);
-  }, [arrivalMessage, currentChat]);
+    axios
+      .get(`${server}/message/get-all-messages/${conversationId}`, {
+        withCredentials: true,
+      })
+      .then((res) => setMessages(res.data.messages || []))
+      .catch((error) => console.log(error));
+  }, [conversationId]);
+
+  const sendMessage = async (event) => {
+    event.preventDefault();
+    if (!newMessage.trim() || !conversationId || !user?._id) return;
+
+    try {
+      const { data } = await axios.post(
+        `${server}/message/create-new-message`,
+        {
+          sender: user._id,
+          text: newMessage.trim(),
+          conversationId,
+        },
+        { withCredentials: true },
+      );
+      await axios.put(
+        `${server}/conversation/update-last-message/${conversationId}`,
+        { lastMessage: newMessage.trim(), lastMessageId: user._id },
+        { withCredentials: true },
+      );
+      setMessages((currentMessages) => [...currentMessages, data.message]);
+      setNewMessage("");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     axios
@@ -47,7 +75,7 @@ const UserInbox = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, [user,message]);
+  }, [user]);
 
 
   useEffect(() => {
@@ -68,129 +96,76 @@ const onlineCheck = (chat) => {
 
 
 
-  // get messages
-  useEffect(() => {
-  const getMessage = async () => {
-    try {
-      const response = await axios.get(`${server}/message/get-all-messages/${currentChat?._id}`);
-      setMessages(response.data.messages);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  getMessage();
-}, [currentChat]);
-
-
-// create new message
-  const sendMessageHandler = async (e) => {
-    e.preventDefault();
-
-    const message = {
-      sender: user._id,
-      text: newMessage,
-      conversationId: currentChat._id,
-    };
-    const receiverId = currentChat.members.find(
-      (member) => member.id !== user?._id,
-    );
-
-    socketId.emit("sendMessage", {
-      senderId: user?._id,
-      receiverId,
-      text: newMessage,
-    });
-
-    try {
-      if (newMessage !== "") {
-        await axios
-          .post(`${server}/message/create-new-message`, message)
-          .then((res) => {
-            setMessages([...messages, res.data.message]);
-            updateLastMessage();
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const updateLastMessage = async () => {
-  socketId.emit("updateLastMessage", {
-    lastMessage: newMessage,
-    lastMessageId: user._id,
-  });
-
-  await axios
-    .put(
-      `${server}/conversation/update-last-message/${currentChat._id}`,
-      {
-        lastMessage: newMessage,
-        lastMessageId: user._id,
-      }
-    )
-    .then((res) => {
-      console.log(res.data.conversation);
-      setNewMessage("");
-    }).catch((error) => {
-      console.log(error);
-    })
-};
-
-
-return (
-    <div className='w-full'>
+  return (
+    <div className="w-full">
     <Header />
-    {!open && (
-      <>
-        <h1 className="text-center text-[30px] py-3 font-Poppins">
-          All Messages
-        </h1>
-        {/* All messages list */}
-        {conversations &&
-          conversations.map((item, index) => (
-            <MessageList
-              data={item}
-              key={index}
-              index={index}
-              setOpen={setOpen}
-              setCurrentChat={setCurrentChat}
-              me={seller._id}
-              setUserData={setUserData}
-              userData={userData}
-              online={onlineCheck(item)}
-              setActiveStatus={setActiveStatus}
+    <h1 className="text-center text-[30px] py-3 font-Poppins">
+      All Messages
+    </h1>
+    <div className="flex gap-4 px-4 pb-4">
+      <div className="w-full max-w-md">
+        {conversations.map((item, index) => (
+          <MessageList
+            data={item}
+            key={item._id || index}
+            index={index}
+            me={user?._id}
+            setUserData={setUserData}
+            userData={userData}
+            online={onlineCheck(item)}
+          />
+        ))}
+      </div>
+      {selectedConversation && (
+        <div className="flex-1 border rounded p-4 min-h-[400px] flex flex-col">
+          <h2 className="text-xl font-semibold mb-3">
+            {userData?.name || "Conversation"}
+          </h2>
+          <div className="flex-1 overflow-y-auto space-y-2">
+            {messages.map((message) => (
+              <div
+                key={message._id}
+                className={`p-2 rounded w-fit ${
+                  message.sender === user?._id
+                    ? "ml-auto bg-black text-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                {message.text}
+              </div>
+            ))}
+          </div>
+          <form onSubmit={sendMessage} className="flex gap-2 mt-3">
+            <input
+              value={newMessage}
+              onChange={(event) => setNewMessage(event.target.value)}
+              placeholder="Write a message..."
+              className="border rounded p-2 flex-1"
             />
-          ))}
-      </>
-    )}
+            <button type="submit" className="bg-black text-white rounded px-4">
+              Send
+            </button>
+          </form>
+        </div>
+      )}
+    </div>
   </div>
-  )
+  );
 }
 
 
 const MessageList = ({
   data,
   index,
-  setOpen,
-  setCurrentChat,
   me,
   setUserData,
   userData,
-  online,
-  setActiveStatus
+  online
 }) => {
+    const navigate = useNavigate()
     const [active,setActive] = useState(0)
-    const [user,setUser] = useState([])
-    const handleClick = (id) => {
-    navigate(`?${id}`);
-    setOpen(true);
-  };
+    const [user,setUser] = useState(null)
     useEffect(() => {
-    setActiveStatus(online)
   const userId = data.members.find((user) => user !== me);
 
   const getUser = async () => {
@@ -210,12 +185,19 @@ const MessageList = ({
         active === index ? "bg-[#00000010]" : "bg-transparent"
       } cursor-pointer`}
       onClick={(e) =>
-        setActive(index) || handleClick(data._id) || setCurrentChat(data) || setUserData(user) || setActiveStatus(online)
+        setActive(index) || navigate(`/inbox/${data._id}`) || setUserData(user)
       }
     >
     <div className="relative">
           <img
-            src={`${backend_url}${userData?.avatar}`}
+            src={
+              user?.avatar?.url ||
+              (typeof user?.avatar === "string"
+                ? user.avatar.startsWith("http")
+                  ? user.avatar
+                  : `${backend_url}${user.avatar.replace(/^\//, "")}`
+                : DEFAULT_AVATAR)
+            }
             alt=""
             className="w-[50px] h-[50px] rounded-full"
           />
@@ -226,11 +208,11 @@ const MessageList = ({
           )}
         </div>
         <div className="pl-3">
-          <h1 className="text-[18px]">{userData?.name}</h1>
+          <h1 className="text-[18px]">{user?.name || "User"}</h1>
           <p className="text-[16px] text-[#000c]">
-            {data?.lastMessageId !== userData?._id
+            {data?.lastMessageId !== user?._id
               ? "You:"
-              : userData.name.split(" ")[0] + ": "}
+              : `${user?.name?.split(" ")[0] || "User"}: `}
             {data?.lastMessage}
           </p>
         </div>

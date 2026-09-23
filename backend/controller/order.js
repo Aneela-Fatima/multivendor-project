@@ -3,6 +3,7 @@ const router = express.Router();
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const Order = require("../model/order");
 const Product = require("../model/product");
+const Shop = require("../model/shop");
 const ErrorHandler = require("../utils/ErrorHandler");
 const { isAuthenticated, isSeller } = require("../middleware/auth");
 
@@ -12,6 +13,10 @@ router.post(
   catchAsyncErrors(async (req, res, next) => {
     try {
       const { cart, shippingAddress, user, totalPrice, paymentInfo } = req.body;
+
+      if (!paymentInfo || paymentInfo.type !== "Cash On Delivery") {
+        return next(new ErrorHandler("Only Cash On Delivery is available", 400));
+      }
 
       // Group cart items by Shop ID
       const shopItemsMap = new Map();
@@ -33,7 +38,10 @@ router.post(
           shippingAddress,
           user,
           totalPrice,
-          paymentInfo,
+          paymentInfo: {
+            type: "Cash On Delivery",
+            status: "Not Paid",
+          },
         });
         orders.push(order);
       }
@@ -89,7 +97,7 @@ router.get(
 );
 
 // update order status for seller
-export const updateStatusOrder = catchAsyncErrors(async (req, res, next) => {
+const updateStatusOrder = catchAsyncErrors(async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id);
 
@@ -107,7 +115,9 @@ export const updateStatusOrder = catchAsyncErrors(async (req, res, next) => {
 
     if (req.body.status === "Delivered") {
       order.deliveredAt = Date.now();
-      order.paymentInfo.status = "Succeeded";
+      if (order.paymentInfo) {
+        order.paymentInfo.status = "Paid";
+      }
       const serviceCharge = order.totalPrice * 0.1;
       await updateSellerBalance(order.totalPrice - serviceCharge);
     }
@@ -141,7 +151,7 @@ export const updateStatusOrder = catchAsyncErrors(async (req, res, next) => {
 });
 
 // order refund user
-export const orderRefund = catchAsyncErrors(async (req, res, next) => {
+const orderRefund = catchAsyncErrors(async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id);
 
@@ -165,7 +175,7 @@ export const orderRefund = catchAsyncErrors(async (req, res, next) => {
 
 
 // refund succcess -- seller
-export const orderRefundSuccess = catchAsyncErrors(async (req, res, next) => {
+const orderRefundSuccess = catchAsyncErrors(async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id);
 
@@ -218,7 +228,7 @@ export const orderRefundSuccess = catchAsyncErrors(async (req, res, next) => {
 
 
 // get all orders --admin
-export const getAllAdminOrders = catchAsyncErrors(async (req, res, next) => {
+const getAllAdminOrders = catchAsyncErrors(async (req, res, next) => {
   isAdmin("Admin")
   try {
     const orders = await Order.find().sort({
@@ -234,5 +244,8 @@ export const getAllAdminOrders = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler(error.message, 500));
   }
 });
+
+router.put("/update-order-status/:id", isSeller, updateStatusOrder);
+router.put("/order-refund-success/:id", isSeller, orderRefundSuccess);
 
 module.exports = router;
