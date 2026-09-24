@@ -11,7 +11,7 @@ const Hero = () => {
       }}
     >
       {/* Background overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/45 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/35 to-transparent" />
 
       {/* Hero content */}
       <div
