@@ -3,6 +3,8 @@ const Withdraw = require("../model/withdraw");
 const Shop = require("../model/shop");
 const ErrorHandler = require("../utils/ErrorHandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+const sendMail = require("../utils/sendMail");
+const { isSeller, isAuthenticated, isAdmin } = require("../middleware/auth");
 const router = express.Router();
 
 // CREATE WITHDRAW REQUEST (SELLER ONLY)
@@ -132,8 +134,13 @@ const updateWithdrawStatus = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-router.post("/create-withdraw-request", createWithdrawRequest);
-router.get("/admin-all-withdraws", getAllWithdraws);
-router.put("/admin-update-withdraw-request/:id", updateWithdrawStatus);
+router.post("/create-withdraw-request", isSeller, createWithdrawRequest);
+router.get("/admin-all-withdraws", isAuthenticated, isAdmin("Admin"), getAllWithdraws);
+router.put(
+  "/admin-update-withdraw-request/:id",
+  isAuthenticated,
+  isAdmin("Admin"),
+  updateWithdrawStatus,
+);
 
 module.exports = router;

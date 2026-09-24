@@ -116,15 +116,17 @@ const Header = ({ activeHeading }) => {
           {/* catagories */}
           <div onClick={() => setDropDown(!dropDown)}>
             <div className="relative h-[60px] mt-[10px] w-[270px] hidden 1000px:block">
-              <BiMenuAltLeft size={30} className="absolute top-3 left-2 " />
+              <BiMenuAltLeft size={26} className="absolute top-[18px] left-3 text-[#352e79]" />
               <button
-                className={`h-[100%] w-full flex justify-between items-center pl-10 bg-white font-sans text-lg font-[500] select-none round-t-md `}
+                className="h-[100%] w-full flex justify-between items-center pl-11 bg-white font-sans text-[15px] font-medium select-none rounded-full shadow-sm hover:shadow-md transition-shadow duration-200"
               >
-                All Catagories
+                All Categories
               </button>
               <IoIosArrowDown
-                size={20}
-                className="absolute right-2 top-4 cursor-pointer"
+                size={18}
+                className={`absolute right-4 top-[21px] cursor-pointer transition-transform duration-200 ${
+                  dropDown ? "rotate-180" : ""
+                }`}
                 onClick={() => setDropDown(!dropDown)}
               />
               {dropDown ? (

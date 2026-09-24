@@ -1,9 +1,8 @@
 import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { DataGrid } from "@mui/x-data-grid";
 import { Button } from "@mui/material";
 import { AiOutlineDelete } from "react-icons/ai";
-import { deleteProduct } from "../../redux/actions/product";
 import Loader from "../Layout/Loader";
 import styles from "../../styles/styles";
 import { useState } from "react";
@@ -23,8 +22,6 @@ const AllCoupons = () => {
   const { seller } = useSelector((state) => state.seller);
   const { products } = useSelector((state) => state.products);
   const [selectedProducts, setSelectedProducts] = useState(null);
-
-  const dispatch = useDispatch();
 
   const loadCoupons = React.useCallback(() => {
     if (!seller?._id) return;
@@ -50,9 +47,16 @@ const AllCoupons = () => {
     loadCoupons();
   }, [loadCoupons]);
 
-  const handleDelete = (id) => {
-    dispatch(deleteProduct(id));
-    window.location.reload();
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${server}/coupon/delete-coupon/${id}`, {
+        withCredentials: true,
+      });
+      toast.success("Coupon code deleted successfully!");
+      loadCoupons();
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to delete coupon");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -88,19 +92,19 @@ const AllCoupons = () => {
   const columns = [
     {
       field: "id",
-      headerName: "Product ID",
+      headerName: "Coupon ID",
       minWidth: 150,
       flex: 0.7,
     },
     {
       field: "name",
-      headerName: "Name",
+      headerName: "Coupon Name",
       minWidth: 180,
       flex: 1.4,
     },
     {
       field: "price",
-      headerName: "Price",
+      headerName: "Discount",
       minWidth: 100,
       flex: 0.6,
     },

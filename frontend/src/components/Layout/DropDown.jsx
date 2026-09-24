@@ -11,26 +11,26 @@ const DropDown = ({ categoriesData, setDropDown }) => {
   };
 
   return (
-    <div className="pb-4 w-[270px] bg-[#fff] absolute z-30 rounded-b-md shadow-sm">
+    <div className="pt-2 w-[270px] bg-white absolute z-30 rounded-2xl shadow-[0_12px_35px_rgba(0,0,0,0.12)] overflow-hidden mt-2 animate-[fadeIn_0.15s_ease-out]">
       {categoriesData &&
         categoriesData.map((i, index) => (
           <div
             key={index}
-            className={`${styles.noramlFlex}`}
+            className={`${styles.noramlFlex} px-2 py-2.5 mx-1.5 my-0.5 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors duration-150`}
             onClick={() => submitHandle(i)}
           >
             <img
               src={i.image_Url}
               style={{
-                width: "25px",
-                height: "25px",
+                width: "26px",
+                height: "26px",
                 objectFit: "contain",
-                marginLeft: "10px",
+                marginLeft: "8px",
                 userSelect: "none",
               }}
               alt=""
             />
-            <h3 className="m-3 cursor-pointer select-none">{i.title}</h3>
+            <h3 className="m-3 text-[15px] select-none">{i.title}</h3>
           </div>
         ))}
     </div>

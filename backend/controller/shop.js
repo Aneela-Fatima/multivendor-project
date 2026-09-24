@@ -10,8 +10,7 @@ const { isAuthenticated } = require("../middleware/auth");
 const { isSeller } = require("../middleware/auth");
 const { isAdmin } = require("../middleware/auth");
 const Shop = require("../model/shop");
-const Product = require("../model/product");
-const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+const Product = require("../model/product");const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const ErrorHandler = require("../utils/ErrorHandler");
 
 
@@ -321,6 +320,9 @@ const deleteSeller = catchAsyncErrors(async (req, res, next) => {
         if (!err) fs.unlink(avatarPath, () => {});
       });
     }
+
+    // Remove all products belonging to this shop, as the UI promises
+    await Product.deleteMany({ shopId: seller._id });
 
     await Shop.findByIdAndDelete(req.params.id);
 

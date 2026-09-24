@@ -73,4 +73,30 @@ router.get(
   })
 );
 
+// delete coupon code
+router.delete(
+  "/delete-coupon/:id",
+  isSeller,
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const couponCode = await CoupounCode.findById(req.params.id);
+
+      if (!couponCode) {
+        return next(new ErrorHandler("Coupon code doesn't exist!", 400));
+      }
+
+      await CoupounCode.findByIdAndDelete(req.params.id);
+
+      res.status(201).json({
+        success: true,
+        message: "Coupon code deleted successfully!",
+      });
+    } catch (error) {
+      return next(
+        new ErrorHandler(error.message || "Unable to delete coupon", 400),
+      );
+    }
+  }),
+);
+
 module.exports = router;

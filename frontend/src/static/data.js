@@ -618,36 +618,46 @@ export const navItems = [
   export const footercompanyLinks = [
     {
       name: "Game & Video",
+      link: "/products",
     },
     {
       name: "Phone &Tablets",
+      link: "/products?category=Smartphones & Tablets",
     },
     {
       name: "Computers & Laptop",
+      link: "/products?category=Computers and Laptops",
     },
     {
       name: "Sport Watches",
+      link: "/products?category=Wearable Technology",
     },
     {
       name: "Events",
+      link: "/events",
     },
   ];
   
   export const footerSupportLinks = [
     {
       name: "FAQ",
+      link: "/faq",
     },
     {
       name: "Reviews",
+      link: "/faq",
     },
     {
       name: "Contact Us",
+      link: "/faq",
     },
     {
       name: "Shipping",
+      link: "/faq",
     },
     {
       name: "Live chat",
+      link: "/faq",
     },
   ];
   

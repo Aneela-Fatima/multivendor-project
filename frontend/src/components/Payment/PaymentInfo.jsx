@@ -43,7 +43,7 @@ const PaymentInfo = ({ cashOnDeliveryHandler }) => {
             <button
               type="submit"
               disabled={isProcessing}
-              className={`${styles.button} w-full !h-[50px] !rounded-md text-[16px] font-semibold tracking-wide ${
+              className={`${styles.button} w-full !h-[50px] !rounded-md text-[16px] font-semibold tracking-wide text-white ${
                 isProcessing ? "opacity-60 cursor-not-allowed" : ""
               }`}
             >

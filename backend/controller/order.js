@@ -251,6 +251,7 @@ const getAllAdminOrders = catchAsyncErrors(async (req, res, next) => {
 });
 
 router.put("/update-order-status/:id", isSeller, updateStatusOrder);
+router.put("/order-refund/:id", isAuthenticated, orderRefund);
 router.put("/order-refund-success/:id", isSeller, orderRefundSuccess);
 router.get("/admin-all-orders", isAuthenticated, isAdmin("Admin"), getAllAdminOrders);
 

@@ -2,9 +2,11 @@ import React from "react";
 import { useSelector } from "react-redux";
 import Header from "../components/Layout/Header";
 import EventCard from "../components/Events/EventCard";
+import { sortEventsByRelevance } from "../utils/sortEvents";
 
 const EventsPage = () => {
   const { allEvents = [], isLoading } = useSelector((state) => state.events);
+  const sortedEvents = sortEventsByRelevance(allEvents);
 
   return (
     <div className="min-h-screen bg-[#f5f7fb]">
@@ -15,9 +17,9 @@ const EventsPage = () => {
           <div className="py-10 text-center text-lg font-medium text-gray-600">
             Loading events...
           </div>
-        ) : allEvents && allEvents.length > 0 ? (
+        ) : sortedEvents && sortedEvents.length > 0 ? (
           <div className="space-y-6">
-            {allEvents.map((event) => (
+            {sortedEvents.map((event) => (
               <EventCard key={event._id} active={true} data={event} />
             ))}
           </div>
