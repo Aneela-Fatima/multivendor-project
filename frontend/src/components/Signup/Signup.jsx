@@ -6,6 +6,7 @@ import { RxAvatar } from "react-icons/rx";
 import axios from "axios";
 import { server } from "../../server";
 import { toast } from "react-toastify";
+import logoIcon from "../../Assests/logo-icon.png";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -53,6 +54,9 @@ const Signup = () => {
   return (
     <div className="min-h-screen  bg-gray-300 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <Link to="/" className="flex justify-center">
+          <img src={logoIcon} alt="ShopO" className="h-16 w-auto" />
+        </Link>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Register as a new user
         </h2>

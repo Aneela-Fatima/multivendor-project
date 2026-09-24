@@ -7,6 +7,7 @@ import {
 } from "../../static/data";
 import { Link } from "react-router-dom";
 import paymentMethodsImg from "../../Assests/paymentmethods.jpeg";
+import logoIcon from "../../Assests/logo-icon.png";
 
 const Footer = () => {
   return (
@@ -43,10 +44,9 @@ const Footer = () => {
       <div className="mx-auto max-w-6xl grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-10 px-6 py-14">
         <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
           <img
-            src="https://shopo.quomodothemes.website/assets/images/logo.svg"
+            src={logoIcon}
             alt="ShopO"
-            style={{ filter: "brightness(0) invert(1)" }}
-            className="h-8"
+            className="h-12 w-auto"
           />
           <p className="text-gray-400 text-sm mt-4 leading-6">
             The home and elements needed to create beautiful products.

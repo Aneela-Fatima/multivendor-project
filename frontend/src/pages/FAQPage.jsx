@@ -2,6 +2,50 @@ import React, { useState } from "react";
 import Header from "../components/Layout/Header";
 import Footer from "../components/Layout/Footer";
 import styles from "../styles/styles";
+import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
+
+const faqData = [
+  {
+    question: "How do I track my order?",
+    answer:
+      "Once your order ships, you can track it any time from Profile > My Orders. Open the order to see its live status — Processing, Shipped, or Delivered — updated by the seller.",
+  },
+  {
+    question: "What is your return and refund policy?",
+    answer:
+      "If something isn't right with your order, open it from My Orders and click Request Refund. The seller reviews the request, and once approved, your refund is processed back to your original payment method.",
+  },
+  {
+    question: "How long does shipping usually take?",
+    answer:
+      "We typically process and ship orders within 1-2 business days. Depending on your location, delivery can take an additional 2-7 days after that.",
+  },
+  {
+    question: "How do I become a seller on ShopO?",
+    answer:
+      'Click "Become Seller" in the header, fill in your shop details, and verify your email. Once activated, you can log in to your Shop Dashboard and start listing products right away.',
+  },
+  {
+    question: "What payment methods are supported?",
+    answer:
+      "Cash on Delivery is available on every order — pay the delivery partner when your package arrives. We're working on adding online payment options soon.",
+  },
+  {
+    question: "Can I message a seller directly?",
+    answer:
+      'Yes. Open any product page and click "Send Message" to start a conversation with the seller — handy for questions about sizing, stock, or delivery estimates before you buy.',
+  },
+  {
+    question: "How do I apply a coupon code at checkout?",
+    answer:
+      "On the checkout page, enter your coupon code in the discount field and click Apply. Coupons are shop-specific, so a code only applies to items from the shop that issued it.",
+  },
+  {
+    question: "Is my personal information safe?",
+    answer:
+      "Yes. Your account details are securely stored, and we never share your personal information with sellers beyond what's needed to fulfill and deliver your order.",
+  },
+];
 
 const FAQPage = () => {
   return (
@@ -16,262 +60,58 @@ const FAQPage = () => {
 const Faq = () => {
   const [activeTab, setActiveTab] = useState(0);
   const toogleTab = (tab) => {
-    if (activeTab === tab) {
-      setActiveTab(0);
-    } else {
-      setActiveTab(tab);
-    }
+    setActiveTab(activeTab === tab ? 0 : tab);
   };
 
   return (
-    <div className={`${styles.section} my-8`}>
-      <h2 className="text-3xl font-bold text-gray-900 mb-8">FAQ</h2>
-      <div className="mx-auto space-y-4 ">
-        {/* single FAQ */}
-        <div className="border-b border-gray-200 pb-4">
-          <button
-            className="flex items-center justify-between w-full"
-            onClick={() => toogleTab(1)}
-          >
-            <span className="text-lg font-medium text-gray-900">
-              How do I track my order?
-            </span>
-            {activeTab === 1 ? (
-              <svg
-                className="h-6 w-6 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+    <div className={`${styles.section} my-10`}>
+      <div className="text-center mb-10">
+        <h2 className="text-3xl font-bold text-gray-900">
+          Frequently Asked Questions
+        </h2>
+        <p className="text-gray-500 mt-2">
+          Everything you need to know about shopping and selling on ShopO
+        </p>
+      </div>
+      <div className="mx-auto max-w-3xl space-y-3">
+        {faqData.map((item, index) => {
+          const tab = index + 1;
+          const isOpen = activeTab === tab;
+          return (
+            <div
+              key={item.question}
+              className={`rounded-2xl border bg-white transition-all duration-200 ${
+                isOpen
+                  ? "border-[#f63b60]/30 shadow-[0_8px_25px_rgba(0,0,0,0.06)]"
+                  : "border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              <button
+                type="button"
+                className="flex items-center justify-between w-full px-5 py-4 text-left"
+                onClick={() => toogleTab(tab)}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6l12 12"
-                ></path>
-              </svg>
-            ) : (
-              <svg
-                className="h-6 w-6 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+                <span className="text-[16px] font-medium text-gray-900 pr-4">
+                  {item.question}
+                </span>
+                <span
+                  className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                    isOpen ? "bg-[#f63b60] text-white" : "bg-gray-100 text-gray-500"
+                  }`}
+                >
+                  {isOpen ? <AiOutlineMinus size={16} /> : <AiOutlinePlus size={16} />}
+                </span>
+              </button>
+              <div
+                className={`px-5 overflow-hidden transition-all duration-300 ${
+                  isOpen ? "max-h-[240px] pb-5" : "max-h-0"
+                }`}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                ></path>
-              </svg>
-            )}
-          </button>
-          {activeTab === 1 && (
-            <div className="mt-4">
-              <p className="text-base text-gray-500">
-                We typically process and ship orders within 1-2 bussiness days.
-                Depending on your location, it can take an addational 2-7 days
-                for your order to arrive.
-              </p>
+                <p className="text-[15px] text-gray-500 leading-6">{item.answer}</p>
+              </div>
             </div>
-          )}
-        </div>
-
-        <div className="border-b border-gray-200 pb-4">
-          <button
-            className="flex items-center justify-between w-full"
-            onClick={() => toogleTab(2)}
-          >
-            <span className="text-lg font-medium text-gray-900">
-              How do I track my order?
-            </span>
-            {activeTab === 2 ? (
-              <svg
-                className="h-6 w-6 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6l12 12"
-                ></path>
-              </svg>
-            ) : (
-              <svg
-                className="h-6 w-6 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                ></path>
-              </svg>
-            )}
-          </button>
-          {activeTab === 2 && (
-            <div className="mt-4">
-              <p className="text-base text-gray-500">
-                We typically process and ship orders within 1-2 bussiness days.
-                Depending on your location, it can take an addational 2-7 days
-                for your order to arrive.
-              </p>
-            </div>
-          )}
-        </div>
-
-        <div className="border-b border-gray-200 pb-4">
-          <button
-            className="flex items-center justify-between w-full"
-            onClick={() => toogleTab(3)}
-          >
-            <span className="text-lg font-medium text-gray-900">
-              How do I track my order?
-            </span>
-            {activeTab === 3 ? (
-              <svg
-                className="h-6 w-6 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6l12 12"
-                ></path>
-              </svg>
-            ) : (
-              <svg
-                className="h-6 w-6 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                ></path>
-              </svg>
-            )}
-          </button>
-          {activeTab === 3 && (
-            <div className="mt-4">
-              <p className="text-base text-gray-500">
-                We typically process and ship orders within 1-2 bussiness days.
-                Depending on your location, it can take an addational 2-7 days
-                for your order to arrive.
-              </p>
-            </div>
-          )}
-        </div>
-
-        <div className="border-b border-gray-200 pb-4">
-          <button
-            className="flex items-center justify-between w-full"
-            onClick={() => toogleTab(4)}
-          >
-            <span className="text-lg font-medium text-gray-900">
-              How do I track my order?
-            </span>
-            {activeTab === 4 ? (
-              <svg
-                className="h-6 w-6 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6l12 12"
-                ></path>
-              </svg>
-            ) : (
-              <svg
-                className="h-6 w-6 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                ></path>
-              </svg>
-            )}
-          </button>
-          {activeTab === 4 && (
-            <div className="mt-4">
-              <p className="text-base text-gray-500">
-                We typically process and ship orders within 1-2 bussiness days.
-                Depending on your location, it can take an addational 2-7 days
-                for your order to arrive.
-              </p>
-            </div>
-          )}
-        </div>
-
-        <div className="border-b border-gray-200 pb-4">
-          <button
-            className="flex items-center justify-between w-full"
-            onClick={() => toogleTab(5)}
-          >
-            <span className="text-lg font-medium text-gray-900">
-              How do I track my order?
-            </span>
-            {activeTab === 5 ? (
-              <svg
-                className="h-6 w-6 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6l12 12"
-                ></path>
-              </svg>
-            ) : (
-              <svg
-                className="h-6 w-6 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                ></path>
-              </svg>
-            )}
-          </button>
-          {activeTab === 5 && (
-            <div className="mt-4">
-              <p className="text-base text-gray-500">
-                We typically process and ship orders within 1-2 bussiness days.
-                Depending on your location, it can take an addational 2-7 days
-                for your order to arrive.
-              </p>
-            </div>
-          )}
-        </div>
+          );
+        })}
       </div>
     </div>
   );

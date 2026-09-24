@@ -6,6 +6,7 @@ import { MdOutlineLocalOffer } from 'react-icons/md'
 import { Link } from 'react-router-dom'
 import { useSelector } from "react-redux";
 import { backend_url } from "../../server";
+import logoIcon from "../../Assests/logo-icon.png";
 
 const AdminHeader = () => {
     const {user} = useSelector((state)=>state.user);
@@ -14,8 +15,9 @@ const AdminHeader = () => {
       <div>
         <Link to="/dashboard">
           <img
-            src="https://shopo.quomodothemes.website/assets/images/logo.svg"
-            alt=""
+            src={logoIcon}
+            alt="ShopO"
+            className="h-11 w-auto"
           />
         </Link>
       </div>
