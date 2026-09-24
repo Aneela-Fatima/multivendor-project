@@ -9,7 +9,7 @@ const Categories = () => {
     <>
       <div className={`${styles.section} hidden sm:block`}>
         <div
-          className={`branding my-12 flex justify-between w-full shadow-sm bg-white p-5 rounded-md`}
+          className={`branding my-12 flex justify-between w-full ${styles.card} bg-white p-5`}
         >
           {brandingData &&
             brandingData.map((i, index) => (
@@ -36,12 +36,16 @@ const Categories = () => {
               };
               return (
                 <div
-                  className="w-full h-[100px] flex items-center justify-between cursor-pointer overflow-hidden"
+                  className="w-full h-[100px] flex items-center justify-between cursor-pointer overflow-hidden rounded-xl px-3 hover:bg-gray-50 hover:shadow-sm transition-all duration-200"
                   key={i.id}
                   onClick={() => handleSubmit(i)}
                 >
-                  <h5 className="text-[18px] leading-[1.3]">{i.title}</h5>
-                  <img src={i.image_Url} className="w-[120px] object-cover" alt="" />
+                  <h5 className="text-[18px] leading-[1.3] font-[500]">{i.title}</h5>
+                  <img
+                    src={i.image_Url}
+                    className="w-[120px] object-cover transition-transform duration-300 hover:scale-105"
+                    alt={i.title}
+                  />
                 </div>
               );
             })}

@@ -10,6 +10,7 @@ const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendMail");
 const sendToken = require("../utils/jwtToken");
 const { isAuthenticated } = require("../middleware/auth");
+const { isAdmin } = require("../middleware/auth");
 const { json } = require("stream/consumers");
 
 router.post("/create-user", upload.single("file"), async (req, res, next) => {
@@ -439,9 +440,12 @@ const deleteUser = catchAsyncErrors(async (req, res, next) => {
       return next(new ErrorHandler("User not found with this id", 404));
     }
 
-    // Delete user avatar from storage
+    // Delete user's local avatar file from the uploads/ folder
     if (user.avatar?.public_id) {
-      await cloudinary.uploader.destroy(user.avatar.public_id);
+      const avatarPath = `uploads/${user.avatar.public_id}`;
+      fs.access(avatarPath, fs.constants.F_OK, (err) => {
+        if (!err) fs.unlink(avatarPath, () => {});
+      });
     }
 
     await User.findByIdAndDelete(req.params.id);
@@ -455,5 +459,7 @@ const deleteUser = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
+router.get("/admin-all-users", isAuthenticated, isAdmin("Admin"), getAllUsers);
+router.delete("/delete-user/:id", isAuthenticated, isAdmin("Admin"), deleteUser);
 
 module.exports = router;

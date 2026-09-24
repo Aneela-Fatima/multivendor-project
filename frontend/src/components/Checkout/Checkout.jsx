@@ -402,7 +402,7 @@ const CartData = ({
   discountPercentage,
 }) => {
   return (
-    <div className="w-full bg-[#fff] rounded-md p-5 pb-8">
+    <div className="w-full bg-white rounded-xl border border-[#e5e7eb] shadow-sm p-5 pb-8">
       <div className="flex justify-between">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">subtotal:</h3>
         <h5 className="text-[18px] font-[600]">${subTotalPrice}</h5>
@@ -432,7 +432,7 @@ const CartData = ({
         />
         <button
           type="submit"
-          className="mt-8 h-[40px] w-full cursor-pointer rounded-[3px] border border-[#f63b60] bg-white text-center text-[#f63b60]"
+          className="mt-8 h-[40px] w-full cursor-pointer rounded-full border border-[#f63b60] bg-white text-center text-[#f63b60] transition-all duration-200 hover:bg-[#f63b60] hover:text-white"
         >
           Apply code
         </button>

@@ -11,6 +11,7 @@ const ShopLoginPage = () => {
     if (isSeller === true) {
       navigate(`/dashboard`);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, isSeller]);
   return (
     <div>

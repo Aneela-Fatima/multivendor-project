@@ -8,6 +8,7 @@ const sendMail = require("../utils/sendMail");
 const sendShopToken = require("../utils/ShopToken");
 const { isAuthenticated } = require("../middleware/auth");
 const { isSeller } = require("../middleware/auth");
+const { isAdmin } = require("../middleware/auth");
 const Shop = require("../model/shop");
 const Product = require("../model/product");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
@@ -313,9 +314,12 @@ const deleteSeller = catchAsyncErrors(async (req, res, next) => {
       return next(new ErrorHandler("Seller not found with this id", 404));
     }
 
-    // Delete seller avatar from local storage
+    // Delete seller's local avatar file from the uploads/ folder
     if (seller.avatar?.public_id) {
-      await cloudinary.uploader.destroy(seller.avatar.public_id);
+      const avatarPath = `uploads/${seller.avatar.public_id}`;
+      fs.access(avatarPath, fs.constants.F_OK, (err) => {
+        if (!err) fs.unlink(avatarPath, () => {});
+      });
     }
 
     await Shop.findByIdAndDelete(req.params.id);
@@ -375,5 +379,7 @@ const deleteWithdrawMethod = catchAsyncErrors(async (req, res, next) => {
 
 router.put("/update-payment-methods", isSeller, updatePaymentMethods);
 router.delete("/delete-withdraw-method", isSeller, deleteWithdrawMethod);
+router.get("/admin-all-sellers", isAuthenticated, isAdmin("Admin"), getAllSellers);
+router.delete("/delete-seller/:id", isAuthenticated, isAdmin("Admin"), deleteSeller);
 
 module.exports = router;

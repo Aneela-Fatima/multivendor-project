@@ -18,6 +18,7 @@ const ShopProfileData = ({ isOwner }) => {
   useEffect(() => {
     dispatch(getAllProductsShop(id));
     dispatch(getAllEventsShop(seller?._id));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
   const allReviews =

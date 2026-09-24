@@ -92,7 +92,7 @@ const Cart = ({ setOpenCart }) => {
 
             <div className="border-t border-slate-200 bg-white p-4">
               <Link to="/checkout">
-                <div className="flex h-[48px] w-full items-center justify-center rounded-[8px] bg-[#e44343] transition hover:bg-[#d63232]">
+                <div className="flex h-[48px] w-full items-center justify-center rounded-full bg-gradient-to-r from-[#f63b60] to-[#e44343] shadow-md transition-all duration-200 hover:shadow-lg hover:scale-[1.02]">
                   <h1 className="text-[18px] font-[600] text-white">
                     Checkout Now (USD${totalPrice.toFixed(2)})
                   </h1>

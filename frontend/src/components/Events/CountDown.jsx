@@ -9,6 +9,7 @@ const CountDown = ({data}) => {
     }, 1000);
 
     return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.Finish_Date]);
 
   function calculateTimeLeft() {

@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { backend_url, server } from "../../server";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import styles from "../../styles/styles";
 import { AiOutlineArrowRight, AiOutlineSend } from "react-icons/ai";
 import { TfiGallery } from "react-icons/tfi";
 import socketIO from "socket.io-client";
@@ -203,19 +202,18 @@ const DashboardMessages = () => {
   };
 
   return (
-    <div className="w-[90%] bg-white m-5 h-[85vh] overflow-y-scroll rounded">
+    <div className="w-[90%] bg-white m-5 h-[85vh] overflow-y-scroll rounded-2xl shadow-sm">
       {/* All messages list */}
       {!open && (
         <>
-          <h1 className="text-center text-[30px] py-3 font-Poppins">
+          <h1 className="text-center text-[24px] py-4 font-Poppins font-semibold border-b">
             All Messages
           </h1>
           {conversations &&
             conversations.map((item, index) => (
               <MessageList
                 data={item}
-                key={index}
-                index={index}
+                key={item._id || index}
                 open={open}
                 setOpen={setOpen}
                 setCurrentChat={setCurrentChat}
@@ -249,7 +247,6 @@ const DashboardMessages = () => {
 
 const MessageList = ({
   data,
-  index,
   setOpen,
   setCurrentChat,
   me,
@@ -263,7 +260,6 @@ const MessageList = ({
     navigate(`?${id}`);
     setOpen(true);
   };
-  const [active, setActive] = useState(0);
 
   useEffect(() => {
     setActiveStatus(online);
@@ -284,18 +280,15 @@ const MessageList = ({
 
   return (
     <div
-      className={`w-full flex p-3 px-3 ${
-        active === index ? "bg-[#00000010]" : "bg-transparent"
-      } cursor-pointer`}
+      className="w-full flex items-center p-3 px-4 gap-3 cursor-pointer transition-colors hover:bg-gray-50"
       onClick={(e) =>
-        setActive(index) ||
         handleClick(data._id) ||
         setCurrentChat(data) ||
         setUserData(user) ||
         setActiveStatus(online)
       }
     >
-      <div className="relative">
+      <div className="relative shrink-0">
         <img
           src={
             user?.avatar?.url ||
@@ -306,20 +299,20 @@ const MessageList = ({
               : DEFAULT_AVATAR)
           }
           alt=""
-          className="w-[50px] h-[50px] rounded-full"
+          className="w-[50px] h-[50px] rounded-full object-cover"
         />
         {online ? (
-          <div className="w-[12px] h-[12px] bg-green-400 rounded-full absolute top-[2px] right-[2px]" />
+          <div className="w-[12px] h-[12px] bg-green-400 border-2 border-white rounded-full absolute bottom-0 right-0" />
         ) : (
-          <div className="w-[12px] h-[12px] bg-[#c7b9b9] rounded-full absolute top-[2px] right-[2px]" />
+          <div className="w-[12px] h-[12px] bg-[#c7b9b9] border-2 border-white rounded-full absolute bottom-0 right-0" />
         )}
       </div>
-      <div className="pl-3">
-        <h1 className="text-[18px]">{user?.name}</h1>
-        <p className="text-[16px] text-[#000c]">
+      <div className="min-w-0 flex-1">
+        <h1 className="text-[16px] font-medium truncate">{user?.name}</h1>
+        <p className="text-[14px] text-gray-500 truncate">
           {data.lastMessageId !== user?._id
-            ? "You:"
-            : `${user?.name?.split(" ")[0] || "User"}:`} {" "}
+            ? "You: "
+            : `${user?.name?.split(" ")[0] || "User"}: `}
           {data?.lastMessage}
         </p>
       </div>
@@ -340,75 +333,91 @@ const SellerInbox = ({
   setImages,
   images,
 }) => {
+  const customerAvatarSrc = userData?.avatar?.url || DEFAULT_AVATAR;
+
   return (
     <div className="w-full min-h-full flex flex-col justify-between">
       {/* message header */}
-      <div className="w-full flex p-3 items-center justify-between bg-slate-200">
-        <div className="flex">
+      <div className="w-full flex items-center justify-between p-4 bg-white border-b">
+        <div className="flex items-center gap-3">
           <img
-            src={`${backend_url}${userData?.avatar}`}
+            src={customerAvatarSrc}
             alt=""
-            className="w-[60px] h-[60px] rounded-full"
+            className="w-[50px] h-[50px] rounded-full object-cover"
           />
-          <div className="pl-3">
-            <h1 className="text-[18px] font-[600]">{userData?.name}</h1>
-            <h1>{activeStatus ? "Active now" : ""}</h1>
+          <div>
+            <h1 className="text-[17px] font-semibold leading-tight">{userData?.name}</h1>
+            {activeStatus && (
+              <span className="text-xs text-green-600">Active now</span>
+            )}
           </div>
         </div>
-        <AiOutlineArrowRight
-          size={20}
-          className="cursor-pointer"
+        <button
+          type="button"
           onClick={() => setOpen(false)}
-        />
+          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+          aria-label="Back to all messages"
+        >
+          <AiOutlineArrowRight size={18} />
+        </button>
       </div>
 
       {/* messages */}
-      <div className="px-3 h-[65vh] py-3 overflow-y-scroll">
+      <div className="px-4 h-[65vh] py-4 overflow-y-scroll bg-[#f7f8fa] space-y-3">
         {messages &&
           messages.map((item, index) => (
             <div
-              className={`flex w-full my-2 ${
+              key={item._id || index}
+              className={`flex items-end gap-2 w-full ${
                 item.sender === sellerId ? "justify-end" : "justify-start"
               }`}
             >
               {item.sender !== sellerId && (
                 <img
-                  src={`${backend_url}${userData?.avatar}`}
-                  className="w-[40px] h-[40px] rounded-full mr-3"
+                  src={customerAvatarSrc}
+                  className="w-[28px] h-[28px] rounded-full object-cover shrink-0"
                   alt=""
                 />
               )}
 
-              {item.images && (
-                <img
-                  src={`${backend_url}${item.images}`}
-                  alt="Message attachment"
-                  className="w-[300px] h-[300px] object-cover rounded-[10px] mr-2"
-                />
-              )}
-              {item.text !== "" && (
-                <div>
-                  <div
-                    className={`w-max p-2 rounded ${
-                      item.sender === sellerId ? "bg-[#000]" : "bg-[#38c776]"
-                    } text-[#fff] h-min`}
-                  >
-                    <p>{item.text}</p>
+              <div>
+                {item.images && (
+                  <img
+                    src={`${backend_url}${item.images}`}
+                    alt="Message attachment"
+                    className="w-[220px] h-[220px] object-cover rounded-[12px] mb-1"
+                  />
+                )}
+                {item.text !== "" && (
+                  <div>
+                    <div
+                      className={`w-max max-w-[320px] break-words px-3 py-2 rounded-2xl ${
+                        item.sender === sellerId
+                          ? "bg-[#f63b60] text-white rounded-br-sm ml-auto"
+                          : "bg-white text-gray-800 rounded-bl-sm shadow-sm"
+                      }`}
+                    >
+                      <p>{item.text}</p>
+                    </div>
+                    <p
+                      className={`text-[11px] text-gray-400 pt-1 ${
+                        item.sender === sellerId ? "text-right" : "text-left"
+                      }`}
+                    >
+                      {format(item.createdAt)}
+                    </p>
                   </div>
-                  <p className="text-[12px] text-[#000000d3] pt-1">
-                    {format(item.createdAt)}
-                  </p>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           ))}
       </div>
       {/* send message input */}
       <form
-        className="p-3 relative w-full flex justify-between items-center"
+        className="p-3 relative w-full flex gap-2 justify-between items-center bg-white border-t"
         onSubmit={sendMessageHandler}
       >
-        <div className="w-[3%]">
+        <div className="shrink-0">
           <input
             type="file"
             name=""
@@ -417,23 +426,23 @@ const SellerInbox = ({
             onChange={handleImageUpload}
           />
           <label htmlFor="image">
-            <TfiGallery className="cursor-pointer" size={20} />
+            <TfiGallery className="cursor-pointer text-gray-500 hover:text-[#f63b60] transition-colors" size={20} />
           </label>
         </div>
-        <div className="w-[97%]">
+        <div className="flex-1 relative">
           <input
             type="text"
             required
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Enter your message..."
-            className={`${styles.input}`}
+            className="w-full border rounded-full px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#f63b60]/30"
           />
           <input type="submit" value="Send" className="hidden" id="send" />
           <label htmlFor="send">
             <AiOutlineSend
-              size={20}
-              className="absolute right-4 top-5 cursor-pointer"
+              size={18}
+              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-[#f63b60] transition-colors"
             />
           </label>
         </div>

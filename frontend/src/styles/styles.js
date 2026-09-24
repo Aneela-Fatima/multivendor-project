@@ -9,14 +9,15 @@ const styles = {
   shop_name: "pt-3 text-[15px] text-blue-400 pb-3",
   active_indicator: "absolute bottom-[-27%] left-0 h-[3px] w-full bg-[crimson]",
   button:
-    "w-[150px] bg-black h-[50px] my-3 flex items-center justify-center rounded-xl cursor-pointer",
+    "w-[150px] bg-black h-[50px] my-3 flex items-center justify-center rounded-xl cursor-pointer shadow-md hover:shadow-lg hover:scale-[1.03] active:scale-[0.98] transition-all duration-200",
   cart_button:
-    "px-[20px] h-[38px] rounded-[20px] bg-[#f63b60] flex items-center justify-center cursor-pointer",
+    "px-[20px] h-[38px] rounded-[20px] bg-[#f63b60] flex items-center justify-center cursor-pointer shadow-md hover:shadow-lg hover:scale-[1.03] active:scale-[0.98] transition-all duration-200",
   cart_button_text: "text-[#fff] text-[16px] font-[600]",
   input: "w-full border p-1 rounded-[5px]",
   activeStatus:
     "w-[10px] h-[10px] rounded-full absolute top-0 right-1 bg-[#40d132]",
   noramlFlex: "flex items-center",
+  card: "bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.12)] transition-all duration-300",
 };
 
 export default styles;

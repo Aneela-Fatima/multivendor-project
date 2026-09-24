@@ -11,6 +11,7 @@ const ShopCreatePage = () => {
     if (isSeller === true) {
       navigate(`/shop/${seller._id}`);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div>

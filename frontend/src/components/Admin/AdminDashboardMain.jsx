@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import styles from "../../styles/styles";
+import React, { useEffect } from "react";
 import { AiOutlineMoneyCollect } from "react-icons/ai";
 import { MdBorderClear } from "react-icons/md";
 import { Link } from "react-router-dom";

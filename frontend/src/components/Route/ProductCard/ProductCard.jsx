@@ -10,11 +10,9 @@ import {addToWishlist, removeFromWishlist} from "../../../redux/actions/wishlist
 import { toast } from "react-toastify";
 import {
   AiFillHeart,
-  AiFillStar,
   AiOutlineEye,
   AiOutlineHeart,
   AiOutlineShoppingCart,
-  AiOutlineStar,
 } from "react-icons/ai";
 import { addToCart } from "../../../redux/actions/cart";
 import Ratings from "../../Products/Ratings";
@@ -81,24 +79,27 @@ const ProductCard = ({ data,isEvent }) => {
     ) || 0;
   const averageRating = data.rating || (reviewCount ? reviewRating / reviewCount : 0);
 
+  const productLink = `/product/${data._id}${isEvent === true ? "?isEvent=true" : ""}`;
+
   return (
     <>
-      <div className="w-full h-[370px] bg-white rounded-lg shadow-sm p-3 cursor-pointer relative">
-        <div className="flex justify-end "></div>
-        <Link to={`${isEvent === true ? `/product/\${data._id}?isEvent=true` : `/product/\${data._id}`}`}>
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt=""
-              className="w-full h-[170px] object-contain"
-            />
-          ) : null}
+      <div className="group w-full h-[390px] bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300 p-3 cursor-pointer relative overflow-hidden">
+        <Link to={productLink}>
+          <div className="w-full h-[180px] flex items-center justify-center overflow-hidden rounded-xl bg-gray-50">
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={data.name}
+                className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+              />
+            ) : null}
+          </div>
         </Link>
-        <Link to={`${isEvent === true ? `/product/\${data._id}?isEvent=true` : `/product/\${data._id}`}`}>
-          <h5 className={`${styles.shop_name}`}>{shopName}</h5>
+        <Link to={productLink}>
+          <h5 className={`${styles.shop_name} hover:text-blue-600 transition-colors`}>{shopName}</h5>
         </Link>
-        <Link to={`/product/${data._id}`}>
-          <h4 className="pb-3 font-[500]">
+        <Link to={productLink}>
+          <h4 className="pb-3 font-[500] group-hover:text-[#f63b60] transition-colors">
             {data.name.length > 40
               ? data.name.slice(0, 40) + "....."
               : data.name}
@@ -109,54 +110,52 @@ const ProductCard = ({ data,isEvent }) => {
           </div>
 
           <div className="py-2 flex items-center justify-between">
-            <div className="flex">
+            <div className="flex items-baseline">
               <h5 className={`${styles.productDiscountPrice}`}>
-                {data.discountPrice}$
+                ${data.discountPrice}
               </h5>
               <h4 className={`${styles.price}`}>
-                {data.originalPrice ? data.originalPrice + " $" : null}
+                {data.originalPrice ? "$" + data.originalPrice : null}
               </h4>
             </div>
-            <span className="font-[400] text-[17px] text-[#68d284]">
+            <span className="font-[400] text-[15px] text-[#68d284]">
               {data?.sold_out} sold
             </span>
           </div>
         </Link>
 
         {/* side options */}
-        <div>
-          {click ? (
-            <AiFillHeart
-              size={22}
-              className="cursor-pointer absolute right-2 top-5"
-              onClick={() => removeFromWishlistHandler(data)}
-              color={click ? "red" : "#333"}
-              title="Remove from wishlist"
-            />
-          ) : (
-            <AiOutlineHeart
-              size={22}
-              className="cursor-pointer absolute right-2 top-5"
-              onClick={() => addToWishlistHandler(data)}
-              color={click ? "red" : "#333"}
-              title="Add to wishlist"
-            />
-          )}
-          <AiOutlineEye
-            size={22}
-            className="cursor-pointer absolute right-2 top-14"
+        <div className="absolute right-3 top-3 flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={() =>
+              click ? removeFromWishlistHandler(data) : addToWishlistHandler(data)
+            }
+            title={click ? "Remove from wishlist" : "Add to wishlist"}
+            className="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center hover:scale-110 transition-transform"
+          >
+            {click ? (
+              <AiFillHeart size={20} color="#f63b60" />
+            ) : (
+              <AiOutlineHeart size={20} color="#333" />
+            )}
+          </button>
+          <button
+            type="button"
             onClick={() => setOpen(!open)}
-            color="#333"
             title="Quick View"
-          />
-
-          <AiOutlineShoppingCart
-            size={25}
-            className="cursor-pointer absolute right-2 top-24"
+            className="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center hover:scale-110 transition-transform"
+          >
+            <AiOutlineEye size={20} color="#333" />
+          </button>
+          <button
+            type="button"
             onClick={() => addToCartHandler(data._id)}
-            color="#444"
             title="Add to cart"
-          />
+            className="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center hover:scale-110 transition-transform"
+          >
+            <AiOutlineShoppingCart size={21} color="#444" />
+          </button>
           {open ? <ProductDetailsCard setOpen={setOpen} data={data} /> : null}
         </div>
       </div>

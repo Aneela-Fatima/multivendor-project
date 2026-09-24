@@ -10,6 +10,7 @@ const SuggestedProduct = ({ data }) => {
   useEffect(()=>{
     const d = allProducts && allProducts.filter((i) => i.category === data.category);
     setProductData(d);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
 
 

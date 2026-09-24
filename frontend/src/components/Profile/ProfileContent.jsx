@@ -6,7 +6,7 @@ import {
   AiOutlineCamera,
   AiOutlineDelete,
 } from "react-icons/ai";
-import { MdOutlineTrackChanges, MdTrackChanges } from "react-icons/md";
+import { MdTrackChanges } from "react-icons/md";
 import styles from "../../styles/styles";
 import { Link } from "react-router-dom";
 import { Button } from "@mui/material";
@@ -30,7 +30,7 @@ const ProfileContent = ({ active }) => {
   const [email, setEmail] = useState(user?.email || "");
   const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || "");
   const [password, setPassword] = useState("");
-  const [avatar, setAvatar] = useState(null);
+  const [, setAvatar] = useState(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -226,6 +226,7 @@ const AllOrders = () => {
 
   useEffect(() => {
     dispatch(getAllOrdersOfUser(user._id));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const coloumns = [
@@ -308,6 +309,7 @@ const AllRefundOrders = () => {
 
   useEffect(() => {
     dispatch(getAllOrdersOfUser(user._id));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const eligibleOrders =

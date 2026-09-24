@@ -15,6 +15,7 @@ const AllRefundOrders = () => {
 
   useEffect(() => {
     dispatch(getAllOrdersOfShop(seller._id));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
   const refundOrders = orders && orders.filter((item)=>item.status === "Processing refund");

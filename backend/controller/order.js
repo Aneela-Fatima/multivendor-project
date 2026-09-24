@@ -5,7 +5,7 @@ const Order = require("../model/order");
 const Product = require("../model/product");
 const Shop = require("../model/shop");
 const ErrorHandler = require("../utils/ErrorHandler");
-const { isAuthenticated, isSeller } = require("../middleware/auth");
+const { isAuthenticated, isSeller, isAdmin } = require("../middleware/auth");
 
 // Create new order
 router.post(
@@ -29,15 +29,21 @@ router.post(
         shopItemsMap.get(shopId).push(item);
       }
 
-      // Create an individual order document per shop
+      // Create an individual order document per shop, each billed for only
+      // that shop's items (not the whole cart's total).
       const orders = [];
 
       for (const [shopId, items] of shopItemsMap) {
+        const shopTotalPrice = items.reduce(
+          (sum, item) => sum + Number(item.discountPrice || 0) * Number(item.qty || 1),
+          0,
+        );
+
         const order = await Order.create({
           cart: items,
           shippingAddress,
           user,
-          totalPrice,
+          totalPrice: shopTotalPrice,
           paymentInfo: {
             type: "Cash On Delivery",
             status: "Not Paid",
@@ -229,7 +235,6 @@ const orderRefundSuccess = catchAsyncErrors(async (req, res, next) => {
 
 // get all orders --admin
 const getAllAdminOrders = catchAsyncErrors(async (req, res, next) => {
-  isAdmin("Admin")
   try {
     const orders = await Order.find().sort({
       deliveredAt: -1,
@@ -247,5 +252,6 @@ const getAllAdminOrders = catchAsyncErrors(async (req, res, next) => {
 
 router.put("/update-order-status/:id", isSeller, updateStatusOrder);
 router.put("/order-refund-success/:id", isSeller, orderRefundSuccess);
+router.get("/admin-all-orders", isAuthenticated, isAdmin("Admin"), getAllAdminOrders);
 
 module.exports = router;
