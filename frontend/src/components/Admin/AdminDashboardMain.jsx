@@ -11,7 +11,7 @@ import Loader from "../Layout/Loader";
 const AdminDashboardMain = () => {
   const dispatch = useDispatch();
   const { adminOrders, adminOrderLoading } = useSelector(
-    (state) => state.orders,
+    (state) => state.order,
   );
 
   const { sellers, sellersLoading } = useSelector((state) => state.seller);

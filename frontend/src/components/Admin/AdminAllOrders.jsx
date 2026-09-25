@@ -7,7 +7,7 @@ import Loader from "../Layout/Loader.jsx";
 const AdminAllOrders = () => {
   const dispatch = useDispatch();
   const { adminOrders, adminOrderLoading, error } = useSelector(
-    (state) => state.orders,
+    (state) => state.order,
   );
 
   useEffect(() => {

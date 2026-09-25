@@ -5,8 +5,10 @@ import { Link, useParams } from "react-router-dom";
 import styles from "../../styles/styles";
 import { getAllProductsShop } from "../../redux/actions/product";
 import { getAllEventsShop } from "../../redux/actions/event";
-import {backend_url} from "../../server"
 import Ratings from "../Products/Ratings";
+
+const DEFAULT_AVATAR =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect width='50' height='50' fill='%23dbe2ea'/%3E%3Ccircle cx='25' cy='19' r='9' fill='%236b7280'/%3E%3Cpath d='M9 47c2-10 30-10 32 0' fill='%236b7280'/%3E%3C/svg%3E";
 
 const ShopProfileData = ({ isOwner }) => {
   const { products } = useSelector((state) => state.products);
@@ -94,10 +96,10 @@ const ShopProfileData = ({ isOwner }) => {
         <div className="w-full">
           {allReviews &&
             allReviews.map((item, index) => (
-              <div className="w-full flex my-4">
+              <div className="w-full flex my-4" key={item._id || index}>
                 <img
-                  src={`${backend_url}/${item.user.avatar}`}
-                  className="w-[50px] h-[50px] rounded-full"
+                  src={item.user?.avatar?.url || DEFAULT_AVATAR}
+                  className="w-[50px] h-[50px] rounded-full object-cover"
                   alt=""
                 />
                 <div className="pl-2">

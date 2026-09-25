@@ -1,11 +1,14 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { backend_url, server } from "../../server";
+import { server } from "../../server";
 import styles from "../../styles/styles";
 import Loader from "../Layout/Loader";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllProductsShop } from "../../redux/actions/product";
+
+const DEFAULT_AVATAR =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect width='50' height='50' fill='%23dbe2ea'/%3E%3Ccircle cx='25' cy='19' r='9' fill='%236b7280'/%3E%3Cpath d='M9 47c2-10 30-10 32 0' fill='%236b7280'/%3E%3C/svg%3E";
 
 const ShopInfo = ({ isOwner }) => {
   const [data,setData] = useState({});
@@ -49,7 +52,7 @@ const ShopInfo = ({ isOwner }) => {
         <div className="w-full flex items-center justify-center">
           <img
             alt=""
-            src={`${backend_url}${data?.avatar}`}
+            src={data?.avatar?.url || DEFAULT_AVATAR}
             className="w-[150px] h-[150px] object-cover rounded-full"
           />
         </div>
