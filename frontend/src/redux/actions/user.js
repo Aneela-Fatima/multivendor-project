@@ -152,7 +152,7 @@ export const getAllUsers = () => async (dispatch) => {
   try {
     dispatch({ type: "getAllUsersRequest" });
 
-    const { data } = await server.get("/user/admin-all-users", {
+    const { data } = await axios.get(`${server}/user/admin-all-users`, {
       withCredentials: true,
     });
 

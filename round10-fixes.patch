@@ -1,0 +1,637 @@
+diff --git a/backend/controller/withdraw.js b/backend/controller/withdraw.js
+index 7bf2b0e..2cc742a 100644
+--- a/backend/controller/withdraw.js
++++ b/backend/controller/withdraw.js
+@@ -135,9 +135,9 @@ const updateWithdrawStatus = catchAsyncErrors(async (req, res, next) => {
+ });
+ 
+ router.post("/create-withdraw-request", isSeller, createWithdrawRequest);
+-router.get("/admin-all-withdraws", isAuthenticated, isAdmin("Admin"), getAllWithdraws);
++router.get("/get-all-withdraw-request", isAuthenticated, isAdmin("Admin"), getAllWithdraws);
+ router.put(
+-  "/admin-update-withdraw-request/:id",
++  "/update-withdraw-request/:id",
+   isAuthenticated,
+   isAdmin("Admin"),
+   updateWithdrawStatus,
+diff --git a/frontend/src/App.css b/frontend/src/App.css
+index cf5f0dd..cbc30b3 100644
+--- a/frontend/src/App.css
++++ b/frontend/src/App.css
+@@ -54,3 +54,8 @@ input[type=number] {
+     transform: translateY(0);
+   }
+ }
++
++.price-tag {
++  font-weight: 700;
++  letter-spacing: -0.01em;
++}
+diff --git a/frontend/src/components/Admin/AdminDashboardMain.jsx b/frontend/src/components/Admin/AdminDashboardMain.jsx
+index 463899f..6ae20df 100644
+--- a/frontend/src/components/Admin/AdminDashboardMain.jsx
++++ b/frontend/src/components/Admin/AdminDashboardMain.jsx
+@@ -81,18 +81,20 @@ const AdminDashboardMain = () => {
+   }
+ 
+   const statCard = (icon, label, value, linkTo, linkLabel) => (
+-    <div className="w-full mb-4 800px:w-[30%] min-h-[18vh] bg-white border border-divider rounded-lg px-4 py-5">
+-      <div className="flex items-center">
+-        <div className="text-voltage">{icon}</div>
+-        <h3 className="font-body text-[15px] font-medium text-ink/60 pl-2">
++    <div className="w-full mb-4 800px:w-[30%] min-h-[18vh] bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 px-5 py-5">
++      <div className="flex items-center gap-3">
++        <div className="w-11 h-11 rounded-full bg-[#f63b60]/10 flex items-center justify-center text-[#f63b60] shrink-0">
++          {icon}
++        </div>
++        <h3 className="text-[14px] font-medium text-gray-500">
+           {label}
+         </h3>
+       </div>
+-      <h5 className="pt-2 pl-[36px] font-display font-semibold text-[22px] text-ink">
++      <h5 className="pt-3 pl-1 text-[24px] font-bold text-gray-900">
+         {value}
+       </h5>
+       <Link to={linkTo}>
+-        <h5 className="pt-4 pl-2 text-voltage hover:underline cursor-pointer font-body text-sm">
++        <h5 className="pt-3 pl-1 text-[#f63b60] hover:underline cursor-pointer text-sm font-medium">
+           {linkLabel}
+         </h5>
+       </Link>
+@@ -101,40 +103,40 @@ const AdminDashboardMain = () => {
+ 
+   return (
+     <div className="w-full p-6">
+-      <h3 className="text-[22px] font-display font-semibold text-ink pb-4">
++      <h3 className="text-[22px] font-semibold text-gray-900 pb-4">
+         Overview
+       </h3>
+ 
+       <div className="w-full block 800px:flex items-center justify-between gap-4">
+         {statCard(
+-          <AiOutlineMoneyCollect size={26} />,
++          <AiOutlineMoneyCollect size={22} />,
+           "Total Earning",
+           `$ ${adminBalance}`,
+-          "/admin/orders",
++          "/admin-orders",
+           "View Orders",
+         )}
+         {statCard(
+-          <MdBorderClear size={26} />,
++          <MdBorderClear size={22} />,
+           "All Sellers",
+           sellers?.length || 0,
+-          "/admin/sellers",
++          "/admin-sellers",
+           "View Sellers",
+         )}
+         {statCard(
+-          <AiOutlineMoneyCollect size={26} />,
++          <AiOutlineMoneyCollect size={22} />,
+           "All Orders",
+           adminOrders?.length || 0,
+-          "/admin/orders",
++          "/admin-orders",
+           "View Orders",
+         )}
+       </div>
+ 
+       <br />
+ 
+-      <h3 className="text-[22px] font-display font-semibold text-ink pb-2">
++      <h3 className="text-[22px] font-semibold text-gray-900 pb-2">
+         Latest Orders
+       </h3>
+-      <div className="w-full min-h-[45vh] bg-white border border-divider rounded-lg">
++      <div className="w-full min-h-[45vh] bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+         <DataGrid
+           rows={rows}
+           columns={columns}
+diff --git a/frontend/src/components/Admin/Layout/AdminSideBar.jsx b/frontend/src/components/Admin/Layout/AdminSideBar.jsx
+index 6f2a0c8..b34a713 100644
+--- a/frontend/src/components/Admin/Layout/AdminSideBar.jsx
++++ b/frontend/src/components/Admin/Layout/AdminSideBar.jsx
+@@ -9,138 +9,49 @@ import { HiOutlineUserGroup } from "react-icons/hi2";
+ import { BsHandbag } from "react-icons/bs";
+ import { AiOutlineSetting } from "react-icons/ai";
+ 
++const navItems = [
++  { id: 1, to: "/admin/dashboard", icon: RxDashboard, label: "Dashboard" },
++  { id: 2, to: "/admin-orders", icon: FiShoppingBag, label: "All Orders" },
++  { id: 3, to: "/admin-sellers", icon: GrWorkshop, label: "All Sellers" },
++  { id: 4, to: "/admin-users", icon: HiOutlineUserGroup, label: "All Users" },
++  { id: 5, to: "/admin-products", icon: BsHandbag, label: "All Products" },
++  { id: 6, to: "/admin-events", icon: MdOutlineLocalOffer, label: "All Events" },
++  { id: 7, to: "/admin-withdraw-request", icon: CiMoneyBill, label: "Withdraw Request" },
++];
++
++const NavRow = ({ to, icon: Icon, label, isActive }) => (
++  <Link to={to} className="block px-3">
++    <div
++      className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl mb-1 transition-colors duration-150 ${
++        isActive
++          ? "bg-[#f63b60]/10 text-[#f63b60]"
++          : "text-[#555] hover:bg-gray-50"
++      }`}
++    >
++      <Icon size={22} />
++      <h5 className="hidden 800px:block text-[15px] font-medium truncate">
++        {label}
++      </h5>
++    </div>
++  </Link>
++);
++
+ const AdminSideBar = ({ active }) => {
+   return (
+     <>
+-      <div className="w-full h-[89vh] bg-white shadow-sm overflow-y-scroll sticky top-0 left-0 z-10">
+-        {/* single item */}
+-
+-        <div className="w-full flex items-center p-4">
+-          <Link to="/admin/dashboard" className="w-full flex items-center ">
+-            <RxDashboard
+-              size={28}
+-              color={`${active === 1 ? "crimson" : "#555"}`}
+-            />
+-            <h5
+-              className={`800px:block hidden pl-2 text-[16px] font-[400] ${active === 1 ? "text-[crimson]" : "text-[#555]"}`}
+-            >
+-              Dashboard
+-            </h5>
+-          </Link>
+-        </div>
+-
+-        <div className="w-full flex items-center p-4">
+-          <Link to="/admin-orders" className="w-full flex items-center">
+-            <FiShoppingBag
+-              size={30}
+-              color={`${active === 2 ? "crimson" : "#555"}`}
+-            />
+-            <h5
+-              className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
+-                active === 2 ? "text-[crimson]" : "text-[#555]"
+-              }`}
+-            >
+-              All Orders
+-            </h5>
+-          </Link>
+-        </div>
+-
+-        <div className="w-full flex items-center p-4">
+-          <Link to="/admin-sellers" className="w-full flex items-center">
+-            <GrWorkshop
+-              size={30}
+-              color={`${active === 3 ? "crimson" : "#555"}`}
+-            />
+-            <h5
+-              className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
+-                active === 3 ? "text-[crimson]" : "text-[#555]"
+-              }`}
+-            >
+-              All Sellers
+-            </h5>
+-          </Link>
+-        </div>
+-
+-        <div className="w-full flex items-center p-4">
+-          <Link to="/admin-users" className="w-full flex items-center">
+-            <HiOutlineUserGroup
+-              size={30}
+-              color={`${active === 4 ? "crimson" : "#555"}`}
+-            />
+-            <h5
+-              className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
+-                active === 4 ? "text-[crimson]" : "text-[#555]"
+-              }`}
+-            >
+-              All Users
+-            </h5>
+-          </Link>
+-        </div>
+-
+-        <div className="w-full flex items-center p-4">
+-          <Link to="/admin-products" className="w-full flex items-center">
+-            <BsHandbag
+-              size={30}
+-              color={`${active === 5 ? "crimson" : "#555"}`}
+-            />
+-            <h5
+-              className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
+-                active === 5 ? "text-[crimson]" : "text-[#555]"
+-              }`}
+-            >
+-              All Products
+-            </h5>
+-          </Link>
+-        </div>
+-
+-        <div className="w-full flex items-center p-4">
+-          <Link to="/admin-events" className="w-full flex items-center">
+-            <MdOutlineLocalOffer
+-              size={30}
+-              color={`${active === 6 ? "crimson" : "#555"}`}
+-            />
+-            <h5
+-              className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
+-                active === 6 ? "text-[crimson]" : "text-[#555]"
+-              }`}
+-            >
+-              All Events
+-            </h5>
+-          </Link>
+-        </div>
+-
+-        <div className="w-full flex items-center p-4">
+-          <Link
+-            to="/admin-withdraw-request"
+-            className="w-full flex items-center "
+-          >
+-            <CiMoneyBill
+-              size={28}
+-              color={`${active === 7 ? "crimson" : "#555"}`}
+-            />
+-            <h5
+-              className={`800px:block hidden pl-2 text-[16px] font-[400] ${active === 7 ? "text-[crimson]" : "text-[#555]"}`}
+-            >
+-              Withdraw Request
+-            </h5>
+-          </Link>
+-        </div>
++      <div className="w-full h-[89vh] bg-white shadow-sm overflow-y-scroll sticky top-0 left-0 z-10 py-3">
++        {navItems.map((item) => (
++          <NavRow key={item.id} {...item} isActive={active === item.id} />
++        ))}
+       </div>
+ 
+-      <div className="w-full flex items-center p-4">
+-        <Link to="/profile" className="w-full flex items-center">
+-          <AiOutlineSetting
+-            size={30}
+-            color={`${active === 8 ? "crimson" : "#555"}`}
+-          />
+-          <h5
+-            className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
+-              active === 8 ? "text-[crimson]" : "text-[#555]"
+-            }`}
+-          >
+-            Settings
+-          </h5>
+-        </Link>
++      <div className="px-3 mt-2">
++        <NavRow
++          to="/profile"
++          icon={AiOutlineSetting}
++          label="Settings"
++          isActive={active === 8}
++        />
+       </div>
+     </>
+   );
+diff --git a/frontend/src/components/Shop/DashboardHero.jsx b/frontend/src/components/Shop/DashboardHero.jsx
+index 96b2c27..7e36376 100644
+--- a/frontend/src/components/Shop/DashboardHero.jsx
++++ b/frontend/src/components/Shop/DashboardHero.jsx
+@@ -82,7 +82,7 @@ const SellerDashboardHero = () => {
+       renderCell: (params) => (
+         <Link to={`/shop/order/${params.row.id}`}>
+           <Button>
+-            <AiOutlineArrowRight size={20} className="text-voltage" />
++            <AiOutlineArrowRight size={20} className="text-[#f63b60]" />
+           </Button>
+         </Link>
+       ),
+@@ -98,18 +98,20 @@ const SellerDashboardHero = () => {
+     })) || [];
+ 
+   const statCard = (icon, label, sublabel, value, linkTo, linkLabel) => (
+-    <div className="w-full mb-4 800px:w-[30%] min-h-[20vh] bg-white border border-divider rounded-lg px-4 py-5">
+-      <div className="flex items-center">
+-        {icon}
+-        <h3 className="font-body text-[15px] leading-5 font-[500] text-ink/60 pl-2">
+-          {label} {sublabel && <span className="text-[13px]">{sublabel}</span>}
++    <div className="w-full mb-4 800px:w-[30%] min-h-[20vh] bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 px-5 py-5">
++      <div className="flex items-center gap-3">
++        <div className="w-11 h-11 rounded-full bg-[#f63b60]/10 flex items-center justify-center text-[#f63b60] shrink-0">
++          {icon}
++        </div>
++        <h3 className="text-[14px] leading-5 font-medium text-gray-500">
++          {label} {sublabel && <span className="text-[12px] block text-gray-400">{sublabel}</span>}
+         </h3>
+       </div>
+-      <h5 className="pt-2 pl-[32px] price-tag text-[20px] text-ink inline-block mt-1">
++      <h5 className="pt-3 pl-1 text-[24px] font-bold text-gray-900">
+         {value}
+       </h5>
+       <Link to={linkTo}>
+-        <h5 className="pt-4 pl-2 text-voltage hover:underline cursor-pointer font-body text-sm">
++        <h5 className="pt-3 pl-1 text-[#f63b60] hover:underline cursor-pointer text-sm font-medium">
+           {linkLabel}
+         </h5>
+       </Link>
+@@ -118,13 +120,13 @@ const SellerDashboardHero = () => {
+ 
+   return (
+     <div className="w-full p-8">
+-      <h3 className="text-[22px] font-display font-[600] text-ink pb-4">
++      <h3 className="text-[22px] font-semibold text-gray-900 pb-4">
+         Overview
+       </h3>
+ 
+       <div className="w-full block 800px:flex items-center justify-between gap-4">
+         {statCard(
+-          <AiOutlineMoneyCollect size={26} className="text-voltage" />,
++          <AiOutlineMoneyCollect size={22} />,
+           "Account Balance",
+           "(10% service charge)",
+           `$${availableBalance}`,
+@@ -132,7 +134,7 @@ const SellerDashboardHero = () => {
+           "Withdraw Money",
+         )}
+         {statCard(
+-          <MdBorderClear size={26} className="text-copper" />,
++          <MdBorderClear size={22} />,
+           "All Orders",
+           null,
+           orders?.length || 0,
+@@ -140,7 +142,7 @@ const SellerDashboardHero = () => {
+           "View Orders",
+         )}
+         {statCard(
+-          <AiOutlineMoneyCollect size={26} className="text-stock" />,
++          <AiOutlineMoneyCollect size={22} />,
+           "All Products",
+           null,
+           products?.length || 0,
+@@ -151,10 +153,10 @@ const SellerDashboardHero = () => {
+ 
+       <br />
+ 
+-      <h3 className="text-[22px] font-display font-[600] text-ink pb-2">
++      <h3 className="text-[22px] font-semibold text-gray-900 pb-2">
+         Latest Orders
+       </h3>
+-      <div className="w-full min-h-[45vh] bg-white border border-divider rounded-lg">
++      <div className="w-full min-h-[45vh] bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+         <DataGrid
+           rows={rows}
+           columns={columns}
+diff --git a/frontend/src/components/Shop/Layout/DashboardSideBar.jsx b/frontend/src/components/Shop/Layout/DashboardSideBar.jsx
+index 17e01a8..ce45298 100644
+--- a/frontend/src/components/Shop/Layout/DashboardSideBar.jsx
++++ b/frontend/src/components/Shop/Layout/DashboardSideBar.jsx
+@@ -9,170 +9,43 @@ import { Link } from "react-router-dom";
+ import { BiMessageSquareDetail } from "react-icons/bi";
+ import { HiOutlineReceiptRefund } from "react-icons/hi";
+ 
++const navItems = [
++  { id: 1, to: "/dashboard", icon: RxDashboard, label: "Dashboard" },
++  { id: 2, to: "/dashboard-orders", icon: FiShoppingBag, label: "All Orders" },
++  { id: 3, to: "/dashboard-products", icon: FiPackage, label: "All Products" },
++  { id: 4, to: "/dashboard-create-product", icon: AiOutlineFolderAdd, label: "Create Products" },
++  { id: 5, to: "/dashboard-events", icon: MdOutlineLocalOffer, label: "All Events" },
++  { id: 6, to: "/dashboard-create-event", icon: VscNewFile, label: "Create Event" },
++  { id: 7, to: "/dashboard-withdraw-money", icon: CiMoneyBill, label: "Withdraw Money" },
++  { id: 8, to: "/dashboard-messages", icon: BiMessageSquareDetail, label: "Shop Inbox" },
++  { id: 9, to: "/dashboard-coupouns", icon: AiOutlineGift, label: "Discount Codes" },
++  { id: 10, to: "/dashboard-refunds", icon: HiOutlineReceiptRefund, label: "Refunds" },
++  { id: 11, to: "/settings", icon: CiSettings, label: "Settings" },
++];
++
++const NavRow = ({ to, icon: Icon, label, isActive }) => (
++  <Link to={to} className="block px-3">
++    <div
++      className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl mb-1 transition-colors duration-150 ${
++        isActive
++          ? "bg-[#f63b60]/10 text-[#f63b60]"
++          : "text-[#555] hover:bg-gray-50"
++      }`}
++    >
++      <Icon size={22} />
++      <h5 className="hidden 800px:block text-[15px] font-medium truncate">
++        {label}
++      </h5>
++    </div>
++  </Link>
++);
++
+ const DashboardSideBar = ({ active }) => {
+   return (
+-    <div className="w-full h-[89vh] bg-white shadow-sm overflow-y-scroll sticky top-0 left-0 z-10">
+-      {/* single item */}
+-
+-      <div className="w-full flex items-center p-4">
+-        <Link to="/dashboard" className="w-full flex items-center ">
+-          <RxDashboard
+-            size={28}
+-            color={`${active === 1 ? "crimson" : "#555"}`}
+-          />
+-          <h5
+-            className={`800px:block hidden pl-2 text-[16px] font-[400] ${active === 1 ? "text-[crimson]" : "text-[#555]"}`}
+-          >
+-            Dashboard
+-          </h5>
+-        </Link>
+-      </div>
+-
+-      <div className="w-full flex items-center p-4">
+-        <Link to="/dashboard-orders" className="w-full flex items-center ">
+-          <FiShoppingBag
+-            size={28}
+-            color={`${active === 2 ? "crimson" : "#555"}`}
+-          />
+-          <h5
+-            className={`800px:block hidden pl-2 text-[16px] font-[400] ${active === 2 ? "text-[crimson]" : "text-[#555]"}`}
+-          >
+-            All Orders
+-          </h5>
+-        </Link>
+-      </div>
+-
+-      <div className="w-full flex items-center p-4">
+-        <Link to="/dashboard-products" className="w-full flex items-center ">
+-          <FiPackage size={28} color={`${active === 3 ? "crimson" : "#555"}`} />
+-          <h5
+-            className={`800px:block hidden pl-2 text-[16px] font-[400] ${active === 3 ? "text-[crimson]" : "text-[#555]"}`}
+-          >
+-            All Products
+-          </h5>
+-        </Link>
+-      </div>
+-
+-      <div className="w-full flex items-center p-4">
+-        <Link
+-          to="/dashboard-create-product"
+-          className="w-full flex items-center"
+-        >
+-          <AiOutlineFolderAdd
+-            size={28}
+-            color={`${active === 4 ? "crimson" : "#555"}`}
+-          />
+-          <h5
+-            className={`800px:block hidden pl-2 text-[16px] font-[400] ${active === 4 ? "text-[crimson]" : "text-[#555]"}`}
+-          >
+-            Create Products
+-          </h5>
+-        </Link>
+-      </div>
+-
+-      <div className="w-full flex items-center p-4">
+-        <Link to="/dashboard-events" className="w-full flex items-center ">
+-          <MdOutlineLocalOffer
+-            size={28}
+-            color={`${active === 5 ? "crimson" : "#555"}`}
+-          />
+-          <h5
+-            className={`800px:block hidden pl-2 text-[16px] font-[400] ${active === 5 ? "text-[crimson]" : "text-[#555]"}`}
+-          >
+-            All Events
+-          </h5>
+-        </Link>
+-      </div>
+-
+-      <div className="w-full flex items-center p-4">
+-        <Link
+-          to="/dashboard-create-event"
+-          className="w-full flex items-center "
+-        >
+-          <VscNewFile
+-            size={28}
+-            color={`${active === 6 ? "crimson" : "#555"}`}
+-          />
+-          <h5
+-            className={`800px:block hidden pl-2 text-[16px] font-[400] ${active === 6 ? "text-[crimson]" : "text-[#555]"}`}
+-          >
+-            Create Event
+-          </h5>
+-        </Link>
+-      </div>
+-
+-      <div className="w-full flex items-center p-4">
+-        <Link
+-          to="/dashboard-withdraw-money"
+-          className="w-full flex items-center "
+-        >
+-          <CiMoneyBill
+-            size={28}
+-            color={`${active === 7 ? "crimson" : "#555"}`}
+-          />
+-          <h5
+-            className={`800px:block hidden pl-2 text-[16px] font-[400] ${active === 7 ? "text-[crimson]" : "text-[#555]"}`}
+-          >
+-            Withdraw Money
+-          </h5>
+-        </Link>
+-      </div>
+-
+-      <div className="w-full flex items-center p-4">
+-        <Link to="/dashboard-messages" className="w-full flex items-center ">
+-          <BiMessageSquareDetail
+-            size={28}
+-            color={`${active === 8 ? "crimson" : "#555"}`}
+-          />
+-          <h5
+-            className={`800px:block hidden pl-2 text-[16px] font-[400] ${active === 8 ? "text-[crimson]" : "text-[#555]"}`}
+-          >
+-            Shop Inbox
+-          </h5>
+-        </Link>
+-      </div>
+-
+-      <div className="w-full flex items-center p-4">
+-        <Link to="/dashboard-coupouns" className="w-full flex items-center ">
+-          <AiOutlineGift
+-            size={28}
+-            color={`${active === 9 ? "crimson" : "#555"}`}
+-          />
+-          <h5
+-            className={`800px:block hidden pl-2 text-[16px] font-[400] ${active === 9 ? "text-[crimson]" : "text-[#555]"}`}
+-          >
+-            Discount Codes
+-          </h5>
+-        </Link>
+-      </div>
+-
+-      <div className="w-full flex items-center p-4">
+-        <Link to="/dashboard-refunds" className="w-full flex items-center ">
+-          <HiOutlineReceiptRefund
+-            size={28}
+-            color={`${active === 10 ? "crimson" : "#555"}`}
+-          />
+-          <h5
+-            className={`800px:block hidden pl-2 text-[16px] font-[400] ${active === 10 ? "text-[crimson]" : "text-[#555]"}`}
+-          >
+-            Refunds
+-          </h5>
+-        </Link>
+-      </div>
+-
+-      <div className="w-full flex items-center p-4">
+-        <Link to="/settings" className="w-full flex items-center ">
+-          <CiSettings
+-            size={28}
+-            color={`${active === 11 ? "crimson" : "#555"}`}
+-          />
+-          <h5
+-            className={`800px:block hidden pl-2 text-[16px] font-[400] ${active === 11 ? "text-[crimson]" : "text-[#555]"}`}
+-          >
+-            Settings
+-          </h5>
+-        </Link>
+-      </div>
++    <div className="w-full h-[89vh] bg-white shadow-sm overflow-y-scroll sticky top-0 left-0 z-10 py-3">
++      {navItems.map((item) => (
++        <NavRow key={item.id} {...item} isActive={active === item.id} />
++      ))}
+     </div>
+   );
+ };
+diff --git a/frontend/src/redux/actions/order.js b/frontend/src/redux/actions/order.js
+index 711a24e..693189c 100644
+--- a/frontend/src/redux/actions/order.js
++++ b/frontend/src/redux/actions/order.js
+@@ -49,7 +49,7 @@ export const getAllOrdersOfAdmin = () => async (dispatch) => {
+     dispatch({ type: "adminAllOrdersRequest" });
+ 
+     const { data } = await axios.get(
+-      `/order/admin-all-orders`,
++      `${server}/order/admin-all-orders`,
+       {
+         withCredentials: true,
+       }
+diff --git a/frontend/src/redux/actions/user.js b/frontend/src/redux/actions/user.js
+index eebb555..f04ace5 100644
+--- a/frontend/src/redux/actions/user.js
++++ b/frontend/src/redux/actions/user.js
+@@ -152,7 +152,7 @@ export const getAllUsers = () => async (dispatch) => {
+   try {
+     dispatch({ type: "getAllUsersRequest" });
+ 
+-    const { data } = await server.get("/user/admin-all-users", {
++    const { data } = await axios.get(`${server}/user/admin-all-users`, {
+       withCredentials: true,
+     });
+ 
+diff --git a/frontend/tailwind.config.js b/frontend/tailwind.config.js
+index 2fc8556..9d165b3 100644
+--- a/frontend/tailwind.config.js
++++ b/frontend/tailwind.config.js
+@@ -15,6 +15,17 @@ module.exports = {
+         "1300px": "1300px",
+         "400px":"400px"
+       },
++      colors: {
++        voltage: "#f63b60",
++        copper: "#f5a623",
++        stock: "#3bc177",
++        divider: "#e5e7eb",
++        ink: "#1f2937",
++      },
++      fontFamily: {
++        display: ["Poppins", "sans-serif"],
++        body: ["Roboto", "sans-serif"],
++      },
+     },
+   },
+   plugins: [],

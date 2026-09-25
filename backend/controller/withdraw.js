@@ -135,9 +135,9 @@ const updateWithdrawStatus = catchAsyncErrors(async (req, res, next) => {
 });
 
 router.post("/create-withdraw-request", isSeller, createWithdrawRequest);
-router.get("/admin-all-withdraws", isAuthenticated, isAdmin("Admin"), getAllWithdraws);
+router.get("/get-all-withdraw-request", isAuthenticated, isAdmin("Admin"), getAllWithdraws);
 router.put(
-  "/admin-update-withdraw-request/:id",
+  "/update-withdraw-request/:id",
   isAuthenticated,
   isAdmin("Admin"),
   updateWithdrawStatus,

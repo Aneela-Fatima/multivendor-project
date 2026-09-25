@@ -15,6 +15,17 @@ module.exports = {
         "1300px": "1300px",
         "400px":"400px"
       },
+      colors: {
+        voltage: "#f63b60",
+        copper: "#f5a623",
+        stock: "#3bc177",
+        divider: "#e5e7eb",
+        ink: "#1f2937",
+      },
+      fontFamily: {
+        display: ["Poppins", "sans-serif"],
+        body: ["Roboto", "sans-serif"],
+      },
     },
   },
   plugins: [],

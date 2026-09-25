@@ -81,18 +81,20 @@ const AdminDashboardMain = () => {
   }
 
   const statCard = (icon, label, value, linkTo, linkLabel) => (
-    <div className="w-full mb-4 800px:w-[30%] min-h-[18vh] bg-white border border-divider rounded-lg px-4 py-5">
-      <div className="flex items-center">
-        <div className="text-voltage">{icon}</div>
-        <h3 className="font-body text-[15px] font-medium text-ink/60 pl-2">
+    <div className="w-full mb-4 800px:w-[30%] min-h-[18vh] bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 px-5 py-5">
+      <div className="flex items-center gap-3">
+        <div className="w-11 h-11 rounded-full bg-[#f63b60]/10 flex items-center justify-center text-[#f63b60] shrink-0">
+          {icon}
+        </div>
+        <h3 className="text-[14px] font-medium text-gray-500">
           {label}
         </h3>
       </div>
-      <h5 className="pt-2 pl-[36px] font-display font-semibold text-[22px] text-ink">
+      <h5 className="pt-3 pl-1 text-[24px] font-bold text-gray-900">
         {value}
       </h5>
       <Link to={linkTo}>
-        <h5 className="pt-4 pl-2 text-voltage hover:underline cursor-pointer font-body text-sm">
+        <h5 className="pt-3 pl-1 text-[#f63b60] hover:underline cursor-pointer text-sm font-medium">
           {linkLabel}
         </h5>
       </Link>
@@ -101,40 +103,40 @@ const AdminDashboardMain = () => {
 
   return (
     <div className="w-full p-6">
-      <h3 className="text-[22px] font-display font-semibold text-ink pb-4">
+      <h3 className="text-[22px] font-semibold text-gray-900 pb-4">
         Overview
       </h3>
 
       <div className="w-full block 800px:flex items-center justify-between gap-4">
         {statCard(
-          <AiOutlineMoneyCollect size={26} />,
+          <AiOutlineMoneyCollect size={22} />,
           "Total Earning",
           `$ ${adminBalance}`,
-          "/admin/orders",
+          "/admin-orders",
           "View Orders",
         )}
         {statCard(
-          <MdBorderClear size={26} />,
+          <MdBorderClear size={22} />,
           "All Sellers",
           sellers?.length || 0,
-          "/admin/sellers",
+          "/admin-sellers",
           "View Sellers",
         )}
         {statCard(
-          <AiOutlineMoneyCollect size={26} />,
+          <AiOutlineMoneyCollect size={22} />,
           "All Orders",
           adminOrders?.length || 0,
-          "/admin/orders",
+          "/admin-orders",
           "View Orders",
         )}
       </div>
 
       <br />
 
-      <h3 className="text-[22px] font-display font-semibold text-ink pb-2">
+      <h3 className="text-[22px] font-semibold text-gray-900 pb-2">
         Latest Orders
       </h3>
-      <div className="w-full min-h-[45vh] bg-white border border-divider rounded-lg">
+      <div className="w-full min-h-[45vh] bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
         <DataGrid
           rows={rows}
           columns={columns}
