@@ -55,7 +55,15 @@ const AdminHeader = () => {
             />
           </Link>
             <img
-            src={`${backend_url}${user?.avatar}`}
+            src={
+                      user?.avatar
+                        ? typeof user.avatar === "string"
+                          ? user.avatar.startsWith("http")
+                            ? user.avatar
+                            : `${backend_url}${user.avatar}`
+                          : user.avatar.url || ""
+                        : "https://via.placeholder.com/35"
+                    }
             alt=""
             className="w-[50px] h-[50px] rounded-full object-cover"
           />

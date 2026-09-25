@@ -70,7 +70,7 @@ const Faq = () => {
           Frequently Asked Questions
         </h2>
         <p className="text-gray-500 mt-2">
-          Everything you need to know about shopping and selling on ShopO
+          Everything you need to know about shopping and selling on Gadget Mall
         </p>
       </div>
       <div className="mx-auto max-w-3xl space-y-3">
