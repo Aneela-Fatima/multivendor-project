@@ -81,7 +81,7 @@ const Header = ({ activeHeading }) => {
               />
             </div>
             {searchData && searchData.length !== 0 ? (
-              <div className="absolute w-full bg-white shadow-[0_15px_35px_rgba(0,0,0,0.12)] rounded-2xl z-[9] p-2 mt-2 max-h-[400px] overflow-y-auto">
+              <div className="absolute w-full bg-white shadow-[0_15px_35px_rgba(0,0,0,0.12)] rounded-2xl z-50 p-2 mt-2 max-h-[400px] overflow-y-auto">
                 {searchData &&
                   searchData.map((i, index) => {
 

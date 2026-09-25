@@ -147,7 +147,7 @@ const ShopWithDrawMoney = () => {
           Minimum withdrawal: $50
         </p>
         <button
-          className={`${styles.button} !h-[42px] !rounded px-8 ${
+          className={`${styles.button} !w-auto !h-[42px] !rounded px-8 whitespace-nowrap ${
             availableBalance < 50 ? "opacity-50 cursor-not-allowed" : ""
           }`}
           onClick={() => {
@@ -162,7 +162,7 @@ const ShopWithDrawMoney = () => {
           Withdraw
         </button>
         <button
-          className={`${styles.button} !h-[42px] !rounded px-8 mt-3 !bg-slate-200 !text-ink`}
+          className={`${styles.button} !w-auto !h-[42px] !rounded px-8 mt-3 whitespace-nowrap !bg-slate-200 !text-ink`}
           onClick={() => {
             setOpen(true);
             setPaymentMethod(true);

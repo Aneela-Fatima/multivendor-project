@@ -128,7 +128,7 @@ const ProfileContent = ({ active }) => {
                   <label className="block pb-2">First Name</label>
                   <input
                     type="text"
-                    className={`{${styles.input} w-[95%] mb-4 800px:mb-0`}
+                    className={`${styles.input} w-[95%] mb-4 800px:mb-0`}
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -139,7 +139,7 @@ const ProfileContent = ({ active }) => {
                   <label className="block pb-2">Email Address</label>
                   <input
                     type="text"
-                    className={`{${styles.input} w-[95%] mb-2 800px:mb-0`}
+                    className={`${styles.input} w-[95%] mb-2 800px:mb-0`}
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -152,7 +152,7 @@ const ProfileContent = ({ active }) => {
                   <label className="block pb-2">Phone Number</label>
                   <input
                     type="number"
-                    className={`{${styles.input} w-[95%] mb-4 800px:mb-0`}
+                    className={`${styles.input} w-[95%] mb-4 800px:mb-0`}
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                   />
@@ -162,7 +162,7 @@ const ProfileContent = ({ active }) => {
                   <label className="block pb-2">Password (optional)</label>
                   <input
                     type="password"
-                    className={`{${styles.input} w-[95%] mb-4 800px:mb-0`}
+                    className={`${styles.input} w-[95%] mb-4 800px:mb-0`}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Leave empty to keep current password"
@@ -517,7 +517,7 @@ const ChangePassword = () => {
             <label className="block pb-2">Enter your old password</label>
             <input
               type="password"
-              className={`{${styles.input} w-[95%] mb-4 800px:mb-0`}
+              className={`${styles.input} w-[95%] mb-4 800px:mb-0`}
               required
               value={oldPassword}
               onChange={(e) => setOldPassword(e.target.value)}
@@ -528,7 +528,7 @@ const ChangePassword = () => {
             <label className="block pb-2">Enter your new password</label>
             <input
               type="password"
-              className={`{${styles.input} w-[95%] mb-4 800px:mb-0`}
+              className={`${styles.input} w-[95%] mb-4 800px:mb-0`}
               required
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -539,7 +539,7 @@ const ChangePassword = () => {
             <label className="block pb-2">Confirm your password</label>
             <input
               type="password"
-              className={`{${styles.input} w-[95%] mb-4 800px:mb-0`}
+              className={`${styles.input} w-[95%] mb-4 800px:mb-0`}
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
