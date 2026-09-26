@@ -1,15 +1,18 @@
 {
-  "name": "multi-vendor-project",
+  "name": "GadgetMall",
   "version": "1.0.0",
   "description": "",
   "license": "ISC",
   "author": "Aneela Fatima",
   "type": "commonjs",
-  "main": "backend/server.js",
+  "main": "server.js",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon backend/server.js",
-    "start": "node backend/server.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
