@@ -1,4 +1,4 @@
-# ShopO — Multi-Vendor E-Commerce Platform
+# GadgetMall — Multi-Vendor E-Commerce Platform
 
 A full-stack MERN multi-vendor marketplace where independent sellers run their own shops, customers browse and buy across every shop from one storefront, and an admin oversees the whole platform. Built with **React** (frontend), **Node.js / Express** (backend API), **MongoDB** (database), and **Socket.IO** (real-time chat).
 
